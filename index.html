@@ -54,6 +54,7 @@ nav.scrolled{background:rgba(5,8,16,0.95);border-color:var(--border-2)}
 .btn-primary:hover{background:#2563eb;transform:translateY(-1px)}
 .mobile-menu-btn{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
 .mobile-menu-btn span{display:block;width:22px;height:1.5px;background:var(--mid);border-radius:2px}
+.mobile-register {display:none;}
 
 /* HERO */
 .hero{min-height:100vh;display:flex;align-items:center;padding:68px 5% 0;position:relative;overflow:hidden}
@@ -247,6 +248,14 @@ footer{background:var(--deep);border-top:1px solid var(--border-1);padding:4rem 
 @media(max-width:960px){
   .nav-links,.nav-cta .btn-ghost{display:none}
   .mobile-menu-btn{display:flex}
+  .mobile-register {
+    display: block;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-1);
+    color: var(--blue) !important;
+    font-weight: 600 !important;
+  }
   .hero-visual{display:none}
   .stats-inner{grid-template-columns:repeat(2,1fr)}
   .stat-block:nth-child(2){border-right:none}
@@ -290,6 +299,7 @@ footer{background:var(--deep);border-top:1px solid var(--border-1);padding:4rem 
     <a href="#pricing">Plans</a>
     <a href="#testimonials">Clients</a>
     <a href="#">Compliance</a>
+    <a href="register.html" class="mobile-register">Register Here</a>
   </div>
   <div class="nav-cta">
     <button class="btn-ghost" onclick="window.location.href='register.html'">Register Here</button>
