@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Client Vault — ArcLight Capital Partners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-void: #050810;
+    --bg-deep: #090d16;
+    --bg-surface: #0e1420;
+    --bg-card: #111827;
+    --bg-card-alt: #131c2e;
+    --bg-hover: #1a2440;
+    --border-dim: rgba(99,130,185,0.12);
+    --border-mid: rgba(99,130,185,0.22);
+    --border-bright: rgba(99,130,185,0.4);
+    --accent-blue: #3b82f6;
+    --accent-blue-dim: rgba(59,130,246,0.15);
+    --accent-blue-glow: rgba(59,130,246,0.08);
+    --accent-cyan: #06b6d4;
+    --accent-cyan-dim: rgba(6,182,212,0.12);
+    --accent-emerald: #10b981;
+    --accent-emerald-dim: rgba(16,185,129,0.15);
+    --accent-gold: #d4a853;
+    --accent-gold-dim: rgba(212,168,83,0.12);
+    --accent-red: #ef4444;
+    --text-primary: #f1f5f9;
+    --text-secondary: #8fa3c8;
+    --text-muted: #4a6080;
+    --text-accent: #93c5fd;
+    --grid-line: rgba(99,130,185,0.05);
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCREEN TRANSITIONS ─────────────────────────── */
+  .screen { display: none; opacity: 0; transition: opacity 0.5s ease; }
+  .screen.active { display: flex; opacity: 1; }
+
+  /* ─── LOGIN SCREEN ──────────────────────────────── */
+  #login-screen {
+    min-height: 100vh;
+    flex-direction: row;
+  }
+
+  /* LEFT PANE */
+  .login-left {
+    flex: 1.1;
+    background: var(--bg-deep);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem;
+    overflow: hidden;
+    border-right: 1px solid var(--border-dim);
+  }
+
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  .grid-fade {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, var(--bg-deep) 100%);
+    pointer-events: none;
+  }
+
+  .corner-accent {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-top: 1px solid var(--border-bright);
+    border-left: 1px solid var(--border-bright);
+    top: 2rem;
+    left: 2rem;
+    border-radius: 4px 0 0 0;
+    opacity: 0.5;
+  }
+
+  .corner-accent-br {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-bottom: 1px solid var(--border-bright);
+    border-right: 1px solid var(--border-bright);
+    bottom: 2rem;
+    right: 2rem;
+    border-radius: 0 0 4px 0;
+    opacity: 0.3;
+  }
+
+  .left-content { position: relative; z-index: 2; }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 3rem;
+  }
+
+  .logo-icon {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-blue-dim);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .logo-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(59,130,246,0.2), transparent);
+  }
+
+  .logo-icon svg { position: relative; z-index: 1; }
+
+  .brand-name {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-primary {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-primary);
+  }
+
+  .brand-secondary {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .left-headline {
+    margin-bottom: 2.5rem;
+  }
+
+  .left-headline h1 {
+    font-size: 38px;
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .left-headline h1 span {
+    font-weight: 600;
+    color: var(--text-accent);
+  }
+
+  .left-headline p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 340px;
+  }
+
+  .security-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #6ee7b7;
+    letter-spacing: 0.04em;
+    margin-bottom: 3rem;
+  }
+
+  .badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-emerald);
+    box-shadow: 0 0 8px var(--accent-emerald);
+    animation: pulse-green 2.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent-emerald); }
+    50% { opacity: 0.6; box-shadow: 0 0 14px var(--accent-emerald); }
+  }
+
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .feature-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-blue-dim);
+    border: 1px solid var(--border-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .left-footer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-dim);
+  }
+
+  .cert-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* RIGHT PANE */
+  .login-right {
+    flex: 0.9;
+    background: var(--bg-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+
+  .login-form-container {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .form-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-header h2 {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .form-header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .session-id {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-dim);
+    border-radius: 4px;
+    padding: 4px 8px;
+    display: inline-block;
+    margin-top: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .form-field {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-field label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .input-wrapper svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md);
+    padding: 13px 14px 13px 44px;
+    font-size: 14px;
+    font-family: var(--font);
+    color: var(--text-primary);
+    transition: border-color var(--transition), background var(--transition);
+    outline: none;
+    letter-spacing: 0.01em;
+  }
+
+  .form-input::placeholder { color: var(--text-muted); }
+
+  .form-input:focus {
+    border-color: var(--accent-blue);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+  }
+
+  .form-input.token-field {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    letter-spacing: 0.15em;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1.5rem 0;
+  }
+
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .toggle-switch {
+    position: relative;
+    width: 38px;
+    height: 22px;
+  }
+
+  .toggle-switch input { display: none; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-mid);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+  }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform var(--transition), background var(--transition);
+  }
+
+  .toggle-switch input:checked + .toggle-track {
+    background: rgba(59,130,246,0.2);
+    border-color: var(--accent-blue);
+  }
+
+  .toggle-switch input:checked + .toggle-track::after {
+    transform: translateX(16px);
+    background: var(--accent-blue);
+  }
+
+  .forgot-link {
+    font-size: 12px;
+    color: var(--text-accent);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity var(--transition);
+  }
+  .forgot-link:hover { opacity: 1; }
+
+  .btn-auth {
+    width: 100%;
+    background: var(--accent-blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background var(--transition), transform var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn-auth::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-auth:hover::before { left: 100%; }
+  .btn-auth:hover { background: #2563eb; }
+  .btn-auth:active { transform: scale(0.99); }
+
+  .btn-auth.loading {
+    pointer-events: none;
+    background: #1d4ed8;
+  }
+
+  .auth-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .security-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ─── LOADING SCREEN ─────────────────────────────── */
+  #loading-screen {
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-void);
+  }
+
+  .loader-ring {
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--border-dim);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1.5rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loader-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .loader-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── DASHBOARD SCREEN ───────────────────────────── */
+  #dash-screen {
+    min-height: 100vh;
+    flex-direction: column;
+    background: var(--bg-void);
+  }
+
+  /* HEADER */
+  .dash-header {
+    background: var(--bg-deep);
+    border-bottom: 1px solid var(--border-dim);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-blue-dim);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-brand-name {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-primary);
+  }
+
+  .header-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border-dim);
+  }
+
+  .header-client {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .client-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .client-tier {
+    font-size: 10.5px;
+    color: var(--accent-gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .header-center {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .nav-link {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color var(--transition);
+    cursor: pointer;
+  }
+  .nav-link:hover { color: var(--text-secondary); }
+  .nav-link.active { color: var(--text-accent); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .session-timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: var(--radius-md);
+    padding: 7px 14px;
+  }
+
+  .timer-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-red);
+    animation: pulse-red 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .timer-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .timer-value {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fca5a5;
+    letter-spacing: 0.08em;
+  }
+
+  .timer-warn .timer-value { color: #fde68a; }
+  .timer-crit { background: rgba(239,68,68,0.15) !important; border-color: rgba(239,68,68,0.4) !important; }
+  .timer-crit .timer-value { color: #f87171 !important; animation: blink 1s ease infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+    color: var(--text-secondary);
+  }
+  .btn-icon:hover { background: var(--bg-hover); border-color: var(--border-mid); color: var(--text-primary); }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1d4ed8, #0891b2);
+    border: 2px solid var(--border-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+
+  /* MAIN CONTENT */
+  .dash-body {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 64px);
+  }
+
+  .dash-main {
+    padding: 2rem;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-dim);
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+  }
+
+  .page-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+
+  .page-subtitle {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .breadcrumb-sep { color: var(--text-muted); opacity: 0.4; }
+
+  .page-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-sm {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all var(--transition);
+    border: 1px solid var(--border-mid);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+  }
+  .btn-sm:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-bright); }
+
+  .btn-sm.primary {
+    background: var(--accent-blue-dim);
+    border-color: rgba(59,130,246,0.35);
+    color: var(--text-accent);
+  }
+  .btn-sm.primary:hover { background: rgba(59,130,246,0.22); }
+
+  /* SUMMARY CARDS */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .s-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+  .s-card:hover { border-color: var(--border-mid); }
+
+  .s-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .s-card.status::before { background: linear-gradient(90deg, var(--accent-emerald), transparent); }
+  .s-card.assets::before { background: linear-gradient(90deg, var(--accent-blue), transparent); }
+  .s-card.docs::before { background: linear-gradient(90deg, var(--accent-gold), transparent); }
+
+  .s-card-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .s-card-main {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .s-card-value {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .s-card-value.mono {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  .s-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .s-card-icon.green { background: var(--accent-emerald-dim); }
+  .s-card-icon.blue { background: var(--accent-blue-dim); }
+  .s-card-icon.gold { background: var(--accent-gold-dim); }
+
+  .s-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-emerald-dim);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 50px;
+    padding: 3px 10px;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: #6ee7b7;
+    letter-spacing: 0.04em;
+  }
+
+  .status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-emerald);
+  }
+
+  /* VAULT TABLE */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .table-wrapper {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .vault-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .vault-table thead {
+    background: var(--bg-card-alt);
+    border-bottom: 1px solid var(--border-dim);
+  }
+
+  .vault-table th {
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .vault-table tbody tr {
+    border-bottom: 1px solid var(--border-dim);
+    transition: background var(--transition);
+  }
+  .vault-table tbody tr:last-child { border-bottom: none; }
+  .vault-table tbody tr:hover { background: rgba(59,130,246,0.03); }
+
+  .vault-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+
+  .file-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .file-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .file-icon.pdf { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+  .file-icon.doc { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
+  .file-icon.xls { background: rgba(16,185,129,0.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.2); }
+  .file-icon.jpg { background: rgba(212,168,83,0.12); color: #fbbf24; border: 1px solid rgba(212,168,83,0.2); }
+  .file-icon.zip { background: rgba(139,92,246,0.12); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.2); }
+
+  .file-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: block;
+  }
+
+  .file-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .enc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--accent-blue-dim);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-accent);
+    letter-spacing: 0.06em;
+  }
+
+  .btn-dl {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm);
+    font-size: 11.5px;
+    font-weight: 500;
+    font-family: var(--font);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+    min-width: 160px;
+    justify-content: center;
+  }
+  .btn-dl:hover { background: var(--bg-hover); border-color: var(--border-mid); color: var(--text-primary); }
+
+  .btn-dl.loading {
+    pointer-events: none;
+    color: var(--accent-cyan);
+    border-color: rgba(6,182,212,0.25);
+    background: rgba(6,182,212,0.06);
+  }
+
+  .btn-dl.success {
+    color: var(--accent-emerald);
+    border-color: rgba(16,185,129,0.3);
+    background: var(--accent-emerald-dim);
+    pointer-events: none;
+  }
+
+  .spin-mini {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ─── SIDEBAR ────────────────────────────────────── */
+  .dash-sidebar {
+    background: var(--bg-deep);
+    padding: 1.75rem;
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    margin-bottom: 2rem;
+  }
+
+  .sidebar-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-dim);
+  }
+
+  /* SECURITY PANEL */
+  .enc-status-panel {
+    background: rgba(16,185,129,0.05);
+    border: 1px solid rgba(16,185,129,0.15);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .enc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .enc-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6ee7b7;
+  }
+
+  .enc-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: rgba(16,185,129,0.2);
+    border-radius: 50%;
+  }
+
+  .enc-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .enc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+
+  .enc-row-label { color: var(--text-muted); }
+  .enc-row-val { color: var(--text-secondary); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10px; letter-spacing: 0.05em; }
+  .enc-row-val.green { color: #6ee7b7; }
+
+  /* ACTIVITY LOG */
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    position: relative;
+  }
+
+  .activity-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 30px;
+    bottom: -10px;
+    width: 1px;
+    background: var(--border-dim);
+  }
+
+  .activity-dot-wrap {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .activity-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border-mid);
+    border: 1.5px solid var(--bg-deep);
+  }
+
+  .activity-dot.green { background: var(--accent-emerald); }
+  .activity-dot.blue { background: var(--accent-blue); }
+  .activity-dot.gold { background: var(--accent-gold); }
+  .activity-dot.red { background: var(--accent-red); }
+
+  .activity-body { flex: 1; min-width: 0; }
+
+  .activity-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    word-break: break-word;
+  }
+
+  .activity-text strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .activity-time {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    letter-spacing: 0.03em;
+  }
+
+  /* SIDEBAR STATS */
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border-dim);
+  }
+  .stat-row:last-child { border-bottom: none; }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .stat-val {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  /* TRUST SCORE */
+  .trust-score-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+  }
+
+  .trust-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .trust-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  .trust-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent-emerald);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    letter-spacing: -0.02em;
+  }
+
+  .trust-bar-track {
+    background: var(--bg-surface);
+    border-radius: 50px;
+    height: 4px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+
+  .trust-bar-fill {
+    height: 100%;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #0891b2, #10b981);
+    width: 0%;
+    transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .trust-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* NOTIFICATION CHIP */
+  .notif-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: var(--accent-red);
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    position: absolute;
+    top: -4px;
+    right: -4px;
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .dash-body { grid-template-columns: 1fr; }
+    .dash-sidebar { border-top: 1px solid var(--border-dim); border-right: none; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 800px) {
+    #login-screen { flex-direction: column; }
+    .login-left { display: none; }
+    .login-right { padding: 2rem 1.5rem; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .header-center { display: none; }
+  }
+
+  /* ─── MISC UTILITIES ─────────────────────────────── */
+  .text-mono {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+  }
+
+  .dim { color: var(--text-muted) !important; }
+
+  .checkmark-anim {
+    animation: pop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  @keyframes pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     STATE 1: LOGIN SCREEN
+════════════════════════════════════════ -->
+<div id="login-screen" class="screen active">
+
+  <!-- LEFT PANE -->
+  <div class="login-left">
+    <div class="grid-bg"></div>
+    <div class="grid-fade"></div>
+    <div class="corner-accent"></div>
+    <div class="corner-accent-br"></div>
+
+    <div class="left-content">
+      <!-- Brand -->
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 2L20 7V15L11 20L2 15V7L11 2Z" stroke="#3b82f6" stroke-width="1.5" fill="none"/>
+            <path d="M11 6L16 9V13L11 16L6 13V9L11 6Z" fill="rgba(59,130,246,0.3)" stroke="#3b82f6" stroke-width="1"/>
+            <circle cx="11" cy="11" r="2" fill="#3b82f6"/>
+          </svg>
+        </div>
+        <div class="brand-name">
+          <span class="brand-primary">ArcLight Capital Partners</span>
+          <span class="brand-secondary">Institutional Wealth Division</span>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <div class="left-headline">
+        <h1>Your Assets,<br><span>Vault-Protected.</span></h1>
+        <p>Institutional-grade document security for high-net-worth clients and family offices. Every file encrypted. Every access audited. Every session verified.</p>
+      </div>
+
+      <!-- Security Badge -->
+      <div class="security-badge">
+        <div class="badge-dot"></div>
+        MILITARY-GRADE SECURITY PROTOCOL ENABLED
+      </div>
+
+      <!-- Features -->
+      <ul class="feature-list">
+        <li>
+          <div class="feature-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="2" y="6" width="10" height="7" rx="1" stroke="#3b82f6" stroke-width="1.2"/>
+              <path d="M4 6V4.5C4 3.12 5.34 2 7 2C8.66 2 10 3.12 10 4.5V6" stroke="#3b82f6" stroke-width="1.2" fill="none"/>
+              <circle cx="7" cy="9.5" r="1" fill="#3b82f6"/>
+            </svg>
+          </div>
+          AES-256 encryption at rest and in transit
+        </li>
+        <li>
+          <div class="feature-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="#3b82f6" stroke-width="1.2"/>
+              <path d="M7 4V7.5L9 9" stroke="#3b82f6" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          Signed URL access with 60-second expiry tokens
+        </li>
+        <li>
+          <div class="feature-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 10L5 7L8 9L12 4" stroke="#3b82f6" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <circle cx="5" cy="7" r="1" fill="#3b82f6"/>
+              <circle cx="8" cy="9" r="1" fill="#3b82f6"/>
+              <circle cx="12" cy="4" r="1" fill="#3b82f6"/>
+            </svg>
+          </div>
+          Immutable audit log — every access recorded
+        </li>
+        <li>
+          <div class="feature-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="3" width="12" height="8" rx="1.5" stroke="#3b82f6" stroke-width="1.2"/>
+              <path d="M5 3V2M9 3V2" stroke="#3b82f6" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M4 7H10M4 9H8" stroke="#3b82f6" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+            </svg>
+          </div>
+          SOC 2 Type II certified infrastructure
+        </li>
+      </ul>
+    </div>
+
+    <div class="left-footer">
+      <div class="cert-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L7.5 4.2L11 4.6L8.5 7L9.2 10.5L6 8.8L2.8 10.5L3.5 7L1 4.6L4.5 4.2L6 1Z" stroke="#4a6080" stroke-width="1" fill="none"/></svg>
+        SOC 2
+      </div>
+      <div class="cert-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2" stroke="#4a6080" stroke-width="1"/><path d="M4 6L5.5 7.5L8 4.5" stroke="#4a6080" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>
+        ISO 27001
+      </div>
+      <div class="cert-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 4V8L6 11L1 8V4L6 1Z" stroke="#4a6080" stroke-width="1" fill="none"/></svg>
+        FINRA COMPLIANT
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANE -->
+  <div class="login-right">
+    <div class="login-form-container">
+      <div class="form-header">
+        <h2>Authenticate to Vault</h2>
+        <p>Your identity is verified using multi-factor cryptographic challenge-response.</p>
+        <div class="session-id">SESSION · EST-2024-11-09T07:32:14Z · TLS 1.3</div>
+      </div>
+
+      <div class="form-field">
+        <label>Registered Email Address</label>
+        <div class="input-wrapper">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#4a6080" stroke-width="1.2"/><path d="M1 5L8 9L15 5" stroke="#4a6080" stroke-width="1.2"/></svg>
+          <input type="email" class="form-input" id="email-input" placeholder="name@institution.com" value="j.harrington@arclight.com" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Secure Access Token</label>
+        <div class="input-wrapper">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1" stroke="#4a6080" stroke-width="1.2"/><path d="M5 7V5.5C5 3.57 6.34 2 8 2C9.66 2 11 3.57 11 5.5V7" stroke="#4a6080" stroke-width="1.2" fill="none"/><circle cx="8" cy="10" r="1" fill="#4a6080"/></svg>
+          <input type="password" class="form-input token-field" placeholder="••••  ••••  ••••  ••••" value="A7K2-P9X1-M4Q8-J3R6">
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle-label">
+          <div class="toggle-switch">
+            <input type="checkbox" id="remember-device" checked>
+            <div class="toggle-track"></div>
+          </div>
+          Remember this device for 30 days
+        </label>
+        <a href="#" class="forgot-link">Forgot token?</a>
+      </div>
+
+      <button class="btn-auth" id="auth-btn" onclick="handleLogin()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1" stroke="white" stroke-width="1.4"/><path d="M5 7V5C5 3.34 6.34 2 8 2C9.66 2 11 3.34 11 5V7" stroke="white" stroke-width="1.4" fill="none"/><circle cx="8" cy="10.5" r="1.2" fill="white"/></svg>
+        Authenticate &amp; Decrypt Vault
+      </button>
+
+      <div class="auth-footer">
+        <div class="security-note">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 3.5V7C11 9.5 8.8 11.5 6 12C3.2 11.5 1 9.5 1 7V3.5L6 1Z" stroke="#4a6080" stroke-width="1" fill="none"/></svg>
+          256-bit encrypted connection
+        </div>
+        <div class="security-note">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#4a6080" stroke-width="1"/><path d="M6 3V6.5L8 8" stroke="#4a6080" stroke-width="1" stroke-linecap="round"/></svg>
+          Session expires in 15 min
+        </div>
+        <div class="security-note">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#4a6080" stroke-width="1"/><path d="M4 6L5.5 7.5L8 4.5" stroke="#4a6080" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>
+          Access logged
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LOADING SCREEN
+════════════════════════════════════════ -->
+<div id="loading-screen" class="screen" style="flex-direction:column">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Decrypting Vault</div>
+  <div class="loader-sub" id="loader-msg">Verifying cryptographic signature…</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     STATE 2: DASHBOARD
+════════════════════════════════════════ -->
+<div id="dash-screen" class="screen" style="flex-direction:column">
+
+  <!-- HEADER -->
+  <header class="dash-header">
+    <div class="header-left">
+      <div class="header-brand">
+        <div class="header-logo-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 1.5L16.5 5.5V12.5L9 16.5L1.5 12.5V5.5L9 1.5Z" stroke="#3b82f6" stroke-width="1.3" fill="none"/>
+            <circle cx="9" cy="9" r="3" fill="rgba(59,130,246,0.25)" stroke="#3b82f6" stroke-width="1"/>
+          </svg>
+        </div>
+        <span class="header-brand-name">ArcLight Secure Vault</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-client">
+        <span class="client-name">James R. Harrington III</span>
+        <span class="client-tier">► Platinum Institutional Client</span>
+      </div>
+    </div>
+
+    <nav class="header-center">
+      <a class="nav-link active">Vault</a>
+      <a class="nav-link">Holdings</a>
+      <a class="nav-link">Reports</a>
+      <a class="nav-link">Compliance</a>
+    </nav>
+
+    <div class="header-right">
+      <div class="session-timer" id="session-timer">
+        <div class="timer-dot"></div>
+        <div>
+          <div class="timer-label">Session Expires</div>
+          <div class="timer-value" id="timer-display">15:00</div>
+        </div>
+      </div>
+
+      <div class="btn-icon" style="position:relative" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C5.24 2 3 4.24 3 7V10L1.5 11.5V12.5H14.5V11.5L13 10V7C13 4.24 10.76 2 8 2Z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6.5 12.5C6.5 13.33 7.17 14 8 14C8.83 14 9.5 13.33 9.5 12.5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+        <div class="notif-chip">3</div>
+      </div>
+
+      <div class="btn-icon" title="Settings">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 1.5V3M8 13V14.5M14.5 8H13M3 8H1.5M12.72 3.28L11.66 4.34M4.34 11.66L3.28 12.72M12.72 12.72L11.66 11.66M4.34 4.34L3.28 3.28" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+
+      <div class="avatar" title="James R. Harrington III">JH</div>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <div class="dash-body">
+
+    <!-- MAIN CONTENT -->
+    <main class="dash-main">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Digital Vault</h1>
+          <div class="page-subtitle">
+            <span>ArcLight Capital</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>Harrington Family Office</span>
+            <span class="breadcrumb-sep">/</span>
+            <span style="color:var(--text-accent)">Secure Documents</span>
+          </div>
+        </div>
+        <div class="page-actions">
+          <button class="btn-sm">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2V9M6.5 9L4 6.5M6.5 9L9 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M2 10H11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Export Log
+          </button>
+          <button class="btn-sm primary">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2V9M6.5 2L4 4.5M6.5 2L9 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/><rect x="2" y="9" width="9" height="2" rx="0.5" fill="currentColor" opacity="0.4"/></svg>
+            Upload Document
+          </button>
+        </div>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="summary-grid">
+
+        <!-- Card 1: Vault Status -->
+        <div class="s-card status">
+          <div class="s-card-label">Vault Status</div>
+          <div class="s-card-main">
+            <div>
+              <div class="s-card-value" style="font-size:15px;margin-bottom:6px">
+                <span class="status-pill">
+                  <span class="status-dot"></span>
+                  Fully Encrypted
+                </span>
+              </div>
+              <div class="s-card-meta">
+                <span class="text-mono dim">AES-256-GCM</span>
+              </div>
+            </div>
+            <div class="s-card-icon green">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5L15.5 4.5V9C15.5 12.6 12.6 15.5 9 16.5C5.4 15.5 2.5 12.6 2.5 9V4.5L9 1.5Z" stroke="#10b981" stroke-width="1.5" fill="none"/><path d="M6 9L8 11L12 7" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            </div>
+          </div>
+          <div class="s-card-meta">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#4a6080" stroke-width="1"/><path d="M5.5 3V5.5L7 7" stroke="#4a6080" stroke-width="1" stroke-linecap="round"/></svg>
+            <span class="dim">Last scan: Today 06:14 AM UTC</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Holdings -->
+        <div class="s-card assets">
+          <div class="s-card-label">Total Tracked Holdings</div>
+          <div class="s-card-main">
+            <div>
+              <div class="s-card-value">$84.7M</div>
+              <div class="s-card-meta" style="margin-top:4px">
+                <span style="color:#86efac;font-size:11px;">↑ 2.4%</span>
+                <span class="dim">vs. prior month</span>
+              </div>
+            </div>
+            <div class="s-card-icon blue">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="14" height="10" rx="1.5" stroke="#3b82f6" stroke-width="1.4"/><path d="M6 5V4C6 3.45 6.45 3 7 3H11C11.55 3 12 3.45 12 4V5" stroke="#3b82f6" stroke-width="1.4" fill="none"/><path d="M2 9H16M7 12H11" stroke="#3b82f6" stroke-width="1" opacity="0.6"/></svg>
+            </div>
+          </div>
+          <div class="s-card-meta">
+            <span class="text-mono dim">12 positions across 4 asset classes</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Documents -->
+        <div class="s-card docs">
+          <div class="s-card-label">Verified Documents</div>
+          <div class="s-card-main">
+            <div>
+              <div class="s-card-value">47</div>
+              <div class="s-card-meta" style="margin-top:4px">
+                <span style="color:#fde68a;font-size:11px;">+3 new</span>
+                <span class="dim">this month</span>
+              </div>
+            </div>
+            <div class="s-card-icon gold">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2H11L15 6V16H4V2Z" stroke="#d4a853" stroke-width="1.4" fill="none"/><path d="M11 2V6H15" stroke="#d4a853" stroke-width="1.4" fill="none"/><path d="M7 9H12M7 11.5H12M7 14H10" stroke="#d4a853" stroke-width="1" stroke-linecap="round" opacity="0.7"/></svg>
+            </div>
+          </div>
+          <div class="s-card-meta">
+            <span class="text-mono dim">All docs hash-verified on vault</span>
+          </div>
+        </div>
+
+      </div><!-- end summary grid -->
+
+      <!-- VAULT TABLE -->
+      <div class="section-header">
+        <div class="section-title">Vault Contents</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="text-mono dim" style="font-size:10px">47 files · 2.8 GB encrypted</div>
+          <button class="btn-sm" style="font-size:11px;padding:5px 10px">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="4.5" cy="4.5" r="3.5" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 7.5L9.5 9.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Filter
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="vault-table">
+          <thead>
+            <tr>
+              <th style="width:35%">File Name</th>
+              <th>Date Vaulted</th>
+              <th>File Size</th>
+              <th>Encryption</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="vault-table-body">
+            <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+
+    <!-- ─── SIDEBAR ──────────────────────── -->
+    <aside class="dash-sidebar">
+
+      <!-- Encryption Status -->
+      <div class="sidebar-section">
+        <div class="sidebar-label">Vault Security</div>
+        <div class="enc-status-panel">
+          <div class="enc-header">
+            <div class="enc-title">All Systems Secure</div>
+            <div class="enc-check">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6L5 8L9 4" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            </div>
+          </div>
+          <div class="enc-rows">
+            <div class="enc-row"><span class="enc-row-label">Cipher</span><span class="enc-row-val">AES-256-GCM</span></div>
+            <div class="enc-row"><span class="enc-row-label">Key Exchange</span><span class="enc-row-val">ECDH P-384</span></div>
+            <div class="enc-row"><span class="enc-row-label">TLS Version</span><span class="enc-row-val green">TLS 1.3</span></div>
+            <div class="enc-row"><span class="enc-row-label">HSTS</span><span class="enc-row-val green">Enabled</span></div>
+            <div class="enc-row"><span class="enc-row-label">Cert Valid Until</span><span class="enc-row-val">2025-03-18</span></div>
+          </div>
+        </div>
+
+        <!-- Trust Score -->
+        <div class="trust-score-card">
+          <div class="trust-header">
+            <span class="trust-title">Vault Integrity Score</span>
+            <span class="trust-val" id="trust-val">100%</span>
+          </div>
+          <div class="trust-bar-track">
+            <div class="trust-bar-fill" id="trust-bar"></div>
+          </div>
+          <div class="trust-label">All 47 documents hash-verified · No tampering detected</div>
+        </div>
+      </div>
+
+      <!-- Account Stats -->
+      <div class="sidebar-section">
+        <div class="sidebar-label">Vault Metadata</div>
+        <div class="stat-row"><span class="stat-label">Client ID</span><span class="stat-val">ARC-HNW-00291</span></div>
+        <div class="stat-row"><span class="stat-label">Vault Region</span><span class="stat-val">US-EAST-1</span></div>
+        <div class="stat-row"><span class="stat-label">Storage Used</span><span class="stat-val">2.8 / 50 GB</span></div>
+        <div class="stat-row"><span class="stat-label">Access Tier</span><span class="stat-val" style="color:var(--accent-gold)">PLATINUM</span></div>
+        <div class="stat-row"><span class="stat-label">Downloads (30d)</span><span class="stat-val">14</span></div>
+        <div class="stat-row"><span class="stat-label">Last Backup</span><span class="stat-val" style="color:#6ee7b7">Today 04:00</span></div>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="sidebar-section">
+        <div class="sidebar-label">Immutable Activity Log</div>
+        <div class="activity-list" id="activity-log">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+    </aside>
+  </div><!-- end dash-body -->
+</div><!-- end dash-screen -->
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════ */
+const vaultFiles = [
+  { name: 'Q3_2024_Portfolio_Summary.pdf', sub: 'Quarterly Report', type: 'pdf', date: 'Nov 05, 2024', size: '4.2 MB', enc: 'AES-256-GCM' },
+  { name: 'Harrington_Trust_Deed_v4.pdf', sub: 'Legal Document', type: 'pdf', date: 'Oct 28, 2024', size: '1.8 MB', enc: 'AES-256-GCM' },
+  { name: 'Asset_Proof_Primary_Holdings.pdf', sub: 'Custodial Record', type: 'pdf', date: 'Oct 12, 2024', size: '2.1 MB', enc: 'AES-256-GCM' },
+  { name: 'Beneficiary_Designation_2024.docx', sub: 'Estate Planning', type: 'doc', date: 'Sep 30, 2024', size: '340 KB', enc: 'AES-256-GCM' },
+  { name: 'Tax_Reporting_Schedule_K1.pdf', sub: 'Tax Document', type: 'pdf', date: 'Sep 14, 2024', size: '890 KB', enc: 'AES-256-GCM' },
+  { name: 'Alternative_Investment_Term_Sheet.pdf', sub: 'Private Equity', type: 'pdf', date: 'Aug 22, 2024', size: '5.6 MB', enc: 'AES-256-GCM' },
+  { name: 'AUM_Reconciliation_Q2_2024.xlsx', sub: 'Reconciliation', type: 'xls', date: 'Aug 01, 2024', size: '1.2 MB', enc: 'AES-256-GCM' },
+  { name: 'Due_Diligence_Package_RE.zip', sub: 'Real Estate Bundle', type: 'zip', date: 'Jul 18, 2024', size: '28.4 MB', enc: 'AES-256-GCM' },
+];
+
+const activityLog = [
+  { time: '06:47 AM', label: 'Today', text: 'Session authenticated via IP <strong>172.91.4.208</strong> · Chrome / macOS', dot: 'green' },
+  { time: '06:45 AM', label: 'Today', text: 'Multi-factor token validated for <strong>j.harrington@arclight.com</strong>', dot: 'green' },
+  { time: '06:14 AM', label: 'Today', text: 'Automated integrity scan completed — <strong>47/47 documents verified</strong>', dot: 'blue' },
+  { time: '11:22 PM', label: 'Yesterday', text: 'Document <strong>Asset_Proof_Primary_Holdings.pdf</strong> viewed', dot: 'gold' },
+  { time: '03:41 PM', label: 'Yesterday', text: 'Signed URL generated for <strong>Q3_2024_Portfolio_Summary.pdf</strong>', dot: 'blue' },
+  { time: 'Nov 6', label: '', text: 'New document uploaded: <strong>Beneficiary_Designation_2024.docx</strong>', dot: 'gold' },
+  { time: 'Nov 5', label: '', text: 'Access attempt from unrecognized device — <strong>blocked</strong>', dot: 'red' },
+  { time: 'Nov 4', label: '', text: 'Vault backup completed to secondary region <strong>US-WEST-2</strong>', dot: 'blue' },
+];
+
+/* ═══════════════════════════════════════════
+   SCREEN MANAGEMENT
+═══════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = id === 'dash-screen' ? 'flex' : (id === 'login-screen' ? 'flex' : 'flex');
+  requestAnimationFrame(() => {
+    el.classList.add('active');
+  });
+}
+
+/* ═══════════════════════════════════════════
+   LOGIN FLOW
+═══════════════════════════════════════════ */
+const loaderMessages = [
+  'Verifying cryptographic signature…',
+  'Establishing secure channel…',
+  'Decrypting vault manifest…',
+  'Loading encrypted document index…',
+  'Applying access policy filters…',
+];
+
+function handleLogin() {
+  const btn = document.getElementById('auth-btn');
+  btn.classList.add('loading');
+  btn.innerHTML = `<span class="spin-mini" style="border-color:rgba(255,255,255,0.4);border-top-color:white"></span> Authenticating…`;
+
+  showScreen('loading-screen');
+
+  let msgIdx = 0;
+  const loaderMsgEl = document.getElementById('loader-msg');
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % loaderMessages.length;
+    loaderMsgEl.textContent = loaderMessages[msgIdx];
+  }, 520);
+
+  setTimeout(() => {
+    clearInterval(msgInterval);
+    initDashboard();
+    showScreen('dash-screen');
+    btn.classList.remove('loading');
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1" stroke="white" stroke-width="1.4"/><path d="M5 7V5C5 3.34 6.34 2 8 2C9.66 2 11 3.34 11 5V7" stroke="white" stroke-width="1.4" fill="none"/><circle cx="8" cy="10.5" r="1.2" fill="white"/></svg> Authenticate &amp; Decrypt Vault`;
+  }, 2800);
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD INIT
+═══════════════════════════════════════════ */
+function initDashboard() {
+  renderTable();
+  renderActivityLog();
+  startTimer();
+  animateTrustBar();
+}
+
+/* TABLE RENDER */
+function renderTable() {
+  const tbody = document.getElementById('vault-table-body');
+  tbody.innerHTML = vaultFiles.map((f, i) => `
+    <tr id="row-${i}">
+      <td>
+        <div class="file-cell">
+          <div class="file-icon ${f.type}">${f.type.toUpperCase()}</div>
+          <div>
+            <span class="file-name">${f.name}</span>
+            <span class="file-sub">${f.sub}</span>
+          </div>
+        </div>
+      </td>
+      <td><span class="text-mono" style="font-size:12px">${f.date}</span></td>
+      <td><span class="text-mono" style="font-size:12px">${f.size}</span></td>
+      <td><span class="enc-badge">
+        <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><rect x="1" y="4" width="7" height="4.5" rx="0.8" stroke="currentColor" stroke-width="1"/><path d="M2.5 4V3.2C2.5 2.26 3.4 1.5 4.5 1.5C5.6 1.5 6.5 2.26 6.5 3.2V4" stroke="currentColor" stroke-width="1" fill="none"/></svg>
+        ${f.enc}
+      </span></td>
+      <td>
+        <button class="btn-dl" id="dl-btn-${i}" onclick="handleDownload(${i})">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V8M6 8L3.5 5.5M6 8L8.5 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M1.5 10H10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Download via Signed URL
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* DOWNLOAD INTERACTION */
+function handleDownload(idx) {
+  const btn = document.getElementById(`dl-btn-${idx}`);
+
+  // Step 1: Loading
+  btn.classList.add('loading');
+  btn.innerHTML = `<span class="spin-mini"></span> Requesting Signed Token…`;
+
+  // Step 2: Success after 1.5s
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    btn.classList.add('success');
+    btn.innerHTML = `
+      <svg class="checkmark-anim" width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#10b981" stroke-width="1.2"/><path d="M4 6.5L5.8 8.3L9.5 4.5" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+      Secure Download Triggered
+    `;
+
+    // Add to activity log
+    addActivityItem(`Signed URL generated for <strong>${vaultFiles[idx].name}</strong>`, 'Just now', 'blue');
+
+    // Reset after 4 seconds
+    setTimeout(() => {
+      btn.classList.remove('success');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V8M6 8L3.5 5.5M6 8L8.5 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M1.5 10H10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Download via Signed URL`;
+    }, 4000);
+  }, 1500);
+}
+
+/* ACTIVITY LOG RENDER */
+function renderActivityLog() {
+  const log = document.getElementById('activity-log');
+  log.innerHTML = activityLog.map((item, i) => `
+    <div class="activity-item">
+      <div class="activity-dot-wrap">
+        <div class="activity-dot ${item.dot}"></div>
+      </div>
+      <div class="activity-body">
+        <div class="activity-text">${item.text}</div>
+        <div class="activity-time">${item.label ? item.label + ' · ' : ''}${item.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addActivityItem(text, time, dot) {
+  const log = document.getElementById('activity-log');
+  const div = document.createElement('div');
+  div.className = 'activity-item';
+  div.style.opacity = '0';
+  div.style.transition = 'opacity 0.4s ease';
+  div.innerHTML = `
+    <div class="activity-dot-wrap"><div class="activity-dot ${dot}"></div></div>
+    <div class="activity-body">
+      <div class="activity-text">${text}</div>
+      <div class="activity-time">${time}</div>
+    </div>
+  `;
+  log.prepend(div);
+  requestAnimationFrame(() => { div.style.opacity = '1'; });
+}
+
+/* SESSION TIMER */
+let timerSeconds = 900;
+let timerInterval = null;
+
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerSeconds = 900;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    if (timerSeconds <= 0) {
+      clearInterval(timerInterval);
+      timerSeconds = 0;
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(timerSeconds / 60);
+  const secs = timerSeconds % 60;
+  const display = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  const el = document.getElementById('timer-display');
+  const container = document.getElementById('session-timer');
+  if (el) el.textContent = display;
+
+  if (container) {
+    container.classList.remove('timer-warn', 'timer-crit');
+    if (timerSeconds <= 60) container.classList.add('timer-crit');
+    else if (timerSeconds <= 180) container.classList.add('timer-warn');
+  }
+}
+
+/* TRUST BAR ANIMATION */
+function animateTrustBar() {
+  setTimeout(() => {
+    const bar = document.getElementById('trust-bar');
+    if (bar) bar.style.width = '100%';
+  }, 300);
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const loginScreen = document.getElementById('login-screen');
+    if (loginScreen && loginScreen.classList.contains('active')) handleLogin();
+  }
+});
+
+showScreen('login-screen');
+</script>
+</body>
+</html>

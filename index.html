@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArcLight Capital Partners — Secure Client Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#050810;--deep:#080d18;--surface:#0d1526;--card:#111f35;--card-alt:#0f1a2e;--hover:#162035;
+  --border-1:rgba(99,140,200,0.10);--border-2:rgba(99,140,200,0.20);--border-3:rgba(99,140,200,0.38);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.14);--blue-glow:rgba(59,130,246,0.06);
+  --cyan:#06b6d4;--cyan-dim:rgba(6,182,212,0.12);
+  --emerald:#10b981;--emerald-dim:rgba(16,185,129,0.12);
+  --gold:#d4a853;--gold-dim:rgba(212,168,83,0.10);
+  --white:#f1f5f9;--mid:#8fa3c8;--muted:#4a6080;--dimmer:#2a3a52;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'SF Mono','Fira Code','Consolas',monospace;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;--r-xl:24px;--r-full:999px;
+  --ease:cubic-bezier(0.4,0,0.2,1);
+}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--white);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--void)}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s var(--ease),transform 0.7s var(--ease)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}.reveal-delay-4{transition-delay:0.4s}
+.reveal-delay-5{transition-delay:0.5s}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(5,8,16,0.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-1);transition:background 0.4s var(--ease),border-color 0.4s var(--ease)}
+nav.scrolled{background:rgba(5,8,16,0.95);border-color:var(--border-2)}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-logo{width:36px;height:36px;border-radius:var(--r-sm);background:var(--blue-dim);border:1px solid rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-name-block{display:flex;flex-direction:column;line-height:1.2}
+.nav-name{font-size:14px;font-weight:600;letter-spacing:0.02em;color:var(--white)}
+.nav-sub{font-size:10px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{font-size:13px;color:var(--muted);letter-spacing:0.03em;transition:color 0.2s;font-weight:400}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{display:flex;align-items:center;gap:10px}
+.btn-ghost{padding:8px 18px;border-radius:var(--r-md);border:1px solid var(--border-2);background:transparent;font-size:13px;font-weight:500;color:var(--mid);font-family:var(--sans);cursor:pointer;transition:all 0.22s var(--ease)}
+.btn-ghost:hover{border-color:var(--border-3);color:var(--white);background:var(--blue-glow)}
+.btn-primary{padding:8px 20px;border-radius:var(--r-md);border:none;background:var(--blue);font-size:13px;font-weight:600;color:#fff;font-family:var(--sans);cursor:pointer;transition:all 0.22s var(--ease);display:flex;align-items:center;gap:6px}
+.btn-primary:hover{background:#2563eb;transform:translateY(-1px)}
+.mobile-menu-btn{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.mobile-menu-btn span{display:block;width:22px;height:1.5px;background:var(--mid);border-radius:2px}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:68px 5% 0;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+.hero-radial{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 30% 50%,transparent 0%,var(--void) 80%);pointer-events:none;z-index:1}
+.hero-glow{position:absolute;top:10%;left:-5%;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,0.06) 0%,transparent 70%);pointer-events:none;animation:drift-l 14s ease-in-out infinite alternate}
+@keyframes drift-l{0%{transform:translate(0,0)}100%{transform:translate(30px,-20px)}}
+.hero-inner{position:relative;z-index:3;max-width:620px;padding:7rem 0 6rem;flex-shrink:0}
+.hero-visual{position:absolute;right:0;top:0;bottom:0;width:52%;z-index:2;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-visual-inner{position:relative;width:100%;height:100%}
+
+/* hero vault illustration positioning */
+.vault-hero-svg{position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:min(560px,90%);height:auto;filter:drop-shadow(0 0 60px rgba(59,130,246,0.12))}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);border-radius:var(--r-full);padding:6px 14px;font-size:11.5px;font-weight:500;color:#6ee7b7;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2rem}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse-g 2s ease-in-out infinite}
+@keyframes pulse-g{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero-title{font-family:var(--serif);font-size:clamp(40px,5.5vw,68px);font-weight:400;line-height:1.08;letter-spacing:-0.01em;color:var(--white);margin-bottom:1.5rem}
+.hero-title em{font-style:italic;color:rgba(147,197,253,0.9)}
+.hero-body{font-size:17px;color:var(--mid);line-height:1.75;max-width:500px;margin-bottom:2.5rem;font-weight:300}
+.hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:3rem}
+.btn-hero{padding:14px 28px;border-radius:var(--r-md);background:var(--blue);border:none;font-size:15px;font-weight:600;color:#fff;font-family:var(--sans);cursor:pointer;transition:all 0.25s var(--ease);display:inline-flex;align-items:center;gap:8px}
+.btn-hero:hover{background:#2563eb;transform:translateY(-2px);box-shadow:0 12px 40px rgba(59,130,246,0.25)}
+.btn-hero-ghost{padding:13px 24px;border-radius:var(--r-md);background:transparent;border:1px solid var(--border-2);font-size:15px;font-weight:500;color:var(--mid);font-family:var(--sans);cursor:pointer;transition:all 0.25s var(--ease);display:inline-flex;align-items:center;gap:8px}
+.btn-hero-ghost:hover{border-color:var(--border-3);color:var(--white)}
+.hero-trust-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+.trust-sep{color:var(--dimmer)}
+
+/* STATS BELT */
+.stats-belt{background:var(--deep);border-top:1px solid var(--border-1);border-bottom:1px solid var(--border-1);padding:0;overflow:hidden}
+.stats-inner{display:grid;grid-template-columns:repeat(4,1fr);max-width:1200px;margin:0 auto}
+.stat-block{padding:2.5rem 2rem;text-align:center;border-right:1px solid var(--border-1);transition:background 0.2s;position:relative;overflow:hidden}
+.stat-block:last-child{border-right:none}
+.stat-block:hover{background:var(--blue-glow)}
+.stat-num{font-family:var(--serif);font-size:42px;font-weight:400;color:var(--white);line-height:1;margin-bottom:6px;letter-spacing:-0.02em}
+.stat-label{font-size:12px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;font-weight:500}
+
+/* SECTIONS */
+section{padding:7rem 5%}
+.section-max{max-width:1200px;margin:0 auto}
+.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem}
+.section-title{font-family:var(--serif);font-size:clamp(32px,4vw,50px);font-weight:400;color:var(--white);line-height:1.15;letter-spacing:-0.01em;margin-bottom:1.25rem}
+.section-body{font-size:16px;color:var(--mid);line-height:1.75;max-width:520px;font-weight:300}
+
+/* SECURITY VISUAL BAND — sits between hero and stats */
+.security-band{background:var(--deep);border-top:1px solid var(--border-1);border-bottom:1px solid var(--border-1);padding:3rem 5%;overflow:hidden}
+.security-band-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.sec-vis-card{background:var(--card);border:1px solid var(--border-1);border-radius:var(--r-lg);padding:1.75rem 1.25rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:1rem;transition:all 0.3s var(--ease);position:relative;overflow:hidden}
+.sec-vis-card:hover{border-color:var(--border-2);background:var(--hover);transform:translateY(-4px)}
+.sec-vis-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:opacity 0.3s}
+.sec-vis-card:hover::before{opacity:1}
+.sec-vis-label{font-size:13px;font-weight:600;color:var(--white);letter-spacing:0.01em}
+.sec-vis-sub{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+/* FEATURES */
+.features-header{margin-bottom:4rem}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border-1);border:1px solid var(--border-1);border-radius:var(--r-lg);overflow:hidden}
+.feat-card{background:var(--deep);padding:2.5rem 2rem;transition:background 0.25s var(--ease);position:relative;overflow:hidden}
+.feat-card:hover{background:var(--surface)}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:opacity 0.3s}
+.feat-card:hover::before{opacity:1}
+.feat-icon{width:44px;height:44px;border-radius:var(--r-md);background:var(--blue-dim);border:1px solid rgba(59,130,246,0.22);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+.feat-title{font-size:16px;font-weight:600;color:var(--white);margin-bottom:10px;letter-spacing:-0.01em}
+.feat-body{font-size:13.5px;color:var(--muted);line-height:1.65;font-weight:300}
+.feat-tag{display:inline-block;margin-top:14px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue)}
+
+/* HOW IT WORKS */
+.hiw-section{background:var(--deep);border-top:1px solid var(--border-1);border-bottom:1px solid var(--border-1)}
+.hiw-layout{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
+.hiw-steps{display:flex;flex-direction:column;gap:0}
+.hiw-step{display:flex;gap:1.5rem;padding:1.5rem 0;border-bottom:1px solid var(--border-1);transition:all 0.25s;cursor:default}
+.hiw-step:first-child{border-top:1px solid var(--border-1)}
+.hiw-step:hover .step-icon-wrap{border-color:rgba(59,130,246,0.4);background:var(--blue-dim)}
+.step-num{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.step-icon-wrap{width:40px;height:40px;flex-shrink:0;border-radius:var(--r-sm);border:1px solid var(--border-2);background:var(--surface);display:flex;align-items:center;justify-content:center;transition:all 0.25s var(--ease);margin-top:4px}
+.step-title{font-size:15px;font-weight:600;color:var(--white);margin-bottom:6px}
+.step-body{font-size:13px;color:var(--muted);line-height:1.6;font-weight:300}
+
+/* VAULT MOCKUP */
+.vault-mockup{background:var(--card);border:1px solid var(--border-2);border-radius:var(--r-xl);padding:1.5rem;position:relative;overflow:hidden}
+.vault-mockup::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.mockup-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border-1)}
+.mockup-title{font-size:13px;font-weight:600;color:var(--white);letter-spacing:0.01em}
+.mockup-status{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#6ee7b7;font-weight:500}
+.m-dot{width:5px;height:5px;border-radius:50%;background:var(--emerald);animation:pulse-g 2s infinite}
+.mockup-file{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-sm);background:var(--card-alt);border:1px solid var(--border-1);margin-bottom:8px;transition:border-color 0.2s}
+.mockup-file:hover{border-color:var(--border-2)}
+.mf-icon{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;flex-shrink:0}
+.mf-pdf{background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.18)}
+.mf-doc{background:rgba(59,130,246,0.12);color:#93c5fd;border:1px solid rgba(59,130,246,0.18)}
+.mf-xls{background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.18)}
+.mf-info{flex:1;min-width:0}
+.mf-name{font-size:12px;font-weight:500;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mf-meta{font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+.mf-enc{font-size:9.5px;font-weight:600;font-family:var(--mono);color:rgba(147,197,253,0.8);background:var(--blue-dim);border:1px solid rgba(59,130,246,0.18);border-radius:4px;padding:2px 6px;letter-spacing:0.05em;flex-shrink:0}
+.mockup-footer{margin-top:14px;padding-top:14px;border-top:1px solid var(--border-1);display:flex;align-items:center;justify-content:space-between}
+.mockup-footer-label{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.mockup-footer-val{font-size:10.5px;color:#6ee7b7;font-family:var(--mono)}
+
+/* SECURITY GRID */
+.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.sec-visual{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.sec-card{background:var(--card);border:1px solid var(--border-1);border-radius:var(--r-lg);padding:1.5rem;transition:all 0.25s var(--ease)}
+.sec-card:hover{border-color:var(--border-2);background:var(--hover)}
+.sec-card.full{grid-column:1/-1}
+.sec-card-label{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);font-weight:600;margin-bottom:10px}
+.sec-card-val{font-size:22px;font-weight:700;color:var(--white);font-family:var(--mono);letter-spacing:-0.02em;margin-bottom:4px}
+.sec-card-sub{font-size:11.5px;color:var(--muted)}
+.compliance-row{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap}
+.comp-badge{display:flex;align-items:center;gap:6px;background:var(--card-alt);border:1px solid var(--border-1);border-radius:var(--r-sm);padding:7px 12px;font-size:11px;font-weight:600;color:var(--mid);letter-spacing:0.05em}
+.sec-list{display:flex;flex-direction:column;gap:16px}
+.sec-item{display:flex;gap:14px;align-items:flex-start}
+.sec-item-icon{width:32px;height:32px;border-radius:var(--r-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2)}
+.sec-item-title{font-size:14px;font-weight:600;color:var(--white);margin-bottom:3px}
+.sec-item-body{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* TESTIMONIALS */
+.testimonials-section{background:var(--deep);border-top:1px solid var(--border-1);border-bottom:1px solid var(--border-1)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem}
+.testi-card{background:var(--card);border:1px solid var(--border-1);border-radius:var(--r-lg);padding:2rem;transition:all 0.25s var(--ease)}
+.testi-card:hover{border-color:var(--border-2);transform:translateY(-3px)}
+.testi-quote{font-size:15px;color:var(--mid);line-height:1.7;font-weight:300;margin-bottom:1.5rem;font-style:italic;font-family:var(--serif)}
+.testi-quote::before{content:'\201C';font-size:48px;color:var(--blue);opacity:0.4;font-family:var(--serif);display:block;line-height:0.8;margin-bottom:12px}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.testi-name{font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px}
+.testi-role{font-size:11px;color:var(--muted)}
+.testi-stars{display:flex;gap:3px;margin-bottom:10px}
+.star{color:var(--gold);font-size:13px}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3.5rem;align-items:start}
+.price-card{background:var(--card);border:1px solid var(--border-1);border-radius:var(--r-xl);padding:2rem;transition:all 0.25s var(--ease)}
+.price-card:hover{border-color:var(--border-2)}
+.price-card.featured{background:var(--surface);border:1px solid rgba(59,130,246,0.35);position:relative}
+.price-card.featured::before{content:'Most Popular';position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:4px 14px;border-radius:var(--r-full);white-space:nowrap}
+.price-tier{font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.price-name{font-size:20px;font-weight:700;color:var(--white);margin-bottom:1.25rem}
+.price-amount{font-family:var(--serif);font-size:48px;color:var(--white);line-height:1;margin-bottom:4px;letter-spacing:-0.02em}
+.price-amount sup{font-family:var(--sans);font-size:20px;font-weight:300;vertical-align:top;margin-top:10px;display:inline-block}
+.price-period{font-size:12px;color:var(--muted);margin-bottom:1.5rem}
+.price-btn{width:100%;padding:12px;border-radius:var(--r-md);font-size:14px;font-weight:600;font-family:var(--sans);cursor:pointer;transition:all 0.22s var(--ease);margin-bottom:1.5rem;border:none}
+.price-btn-outline{background:transparent;border:1px solid var(--border-2);color:var(--mid)}
+.price-btn-outline:hover{border-color:var(--border-3);color:var(--white)}
+.price-btn-solid{background:var(--blue);color:#fff}
+.price-btn-solid:hover{background:#2563eb}
+.price-divider{border:none;border-top:1px solid var(--border-1);margin-bottom:1.25rem}
+.price-feature{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--mid);margin-bottom:10px;line-height:1.4}
+.check{color:var(--emerald);font-size:13px;margin-top:1px;flex-shrink:0}
+.cross{color:var(--muted);font-size:13px;margin-top:1px;flex-shrink:0;opacity:0.4}
+
+/* CTA */
+.cta-section{padding:7rem 5%;position:relative;overflow:hidden}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(59,130,246,0.07) 0%,transparent 70%);pointer-events:none}
+.cta-inner{max-width:700px;margin:0 auto;text-align:center;position:relative;z-index:2}
+.cta-title{font-family:var(--serif);font-size:clamp(36px,5vw,58px);font-weight:400;line-height:1.1;color:var(--white);margin-bottom:1.25rem;letter-spacing:-0.01em}
+.cta-title em{font-style:italic;color:rgba(147,197,253,0.85)}
+.cta-body{font-size:16px;color:var(--mid);margin-bottom:2.5rem;line-height:1.7;font-weight:300}
+.cta-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.cta-note{margin-top:1.5rem;font-size:12px;color:var(--muted)}
+
+/* FOOTER */
+footer{background:var(--deep);border-top:1px solid var(--border-1);padding:4rem 5% 2rem}
+.footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.footer-brand{max-width:280px}
+.footer-logo{display:flex;align-items:center;gap:12px;margin-bottom:1rem}
+.footer-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem}
+.footer-badges{display:flex;gap:8px;flex-wrap:wrap}
+.fbadge{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border-1);border-radius:var(--r-sm);padding:4px 10px;font-size:9.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.footer-col h4{font-size:11.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);margin-bottom:1rem}
+.footer-col a{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;transition:color 0.2s}
+.footer-col a:hover{color:var(--mid)}
+.footer-bottom{max-width:1200px;margin:0 auto;padding-top:2rem;border-top:1px solid var(--border-1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-copy{font-size:12px;color:var(--muted)}
+.footer-legal{display:flex;gap:20px}
+.footer-legal a{font-size:12px;color:var(--muted);transition:color 0.2s}
+.footer-legal a:hover{color:var(--mid)}
+
+/* ILLUSTRATION KEYFRAMES */
+@keyframes rotate-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes rotate-rev{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+@keyframes float-y{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes lock-pulse{0%,100%{opacity:0.5;r:22}50%{opacity:1;r:28}}
+@keyframes scan-line{0%{transform:translateY(-100%);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(700%);opacity:0}}
+@keyframes data-flow{0%{stroke-dashoffset:200}100%{stroke-dashoffset:0}}
+@keyframes blink-cursor{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes spin-ring{from{transform:rotate(0deg) translateX(0)}to{transform:rotate(360deg) translateX(0)}}
+
+/* MOBILE */
+@media(max-width:960px){
+  .nav-links,.nav-cta .btn-ghost{display:none}
+  .mobile-menu-btn{display:flex}
+  .hero-visual{display:none}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .stat-block:nth-child(2){border-right:none}
+  .stat-block:nth-child(3){border-top:1px solid var(--border-1)}
+  .security-band-inner{grid-template-columns:repeat(2,1fr)}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .hiw-layout{grid-template-columns:1fr}
+  .vault-mockup{display:none}
+  .security-grid{grid-template-columns:1fr}
+  .testi-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  section{padding:5rem 5%}
+  .features-grid,.security-band-inner{grid-template-columns:1fr}
+  .hero-actions{flex-direction:column;align-items:flex-start}
+  .stats-inner{grid-template-columns:1fr}
+  .stat-block{border-right:none;border-bottom:1px solid var(--border-1)}
+  .footer-grid{grid-template-columns:1fr}
+  .sec-visual{grid-template-columns:1fr}
+  .sec-card.full{grid-column:auto}
+}
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.5L18 5.5V14L10 18L2 14V5.5L10 1.5Z" stroke="#3b82f6" stroke-width="1.4" fill="none"/><path d="M10 5.5L14 7.5V11.5L10 13.5L6 11.5V7.5L10 5.5Z" fill="rgba(59,130,246,0.25)" stroke="#3b82f6" stroke-width="1"/><circle cx="10" cy="9.5" r="1.8" fill="#3b82f6"/></svg>
+    </div>
+    <div class="nav-name-block">
+      <span class="nav-name">ArcLight Capital Partners</span>
+      <span class="nav-sub">Secure Client Vault</span>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Security</a>
+    <a href="#how">How It Works</a>
+    <a href="#pricing">Plans</a>
+    <a href="#testimonials">Clients</a>
+    <a href="#">Compliance</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn-ghost" onclick="window.location.href='register.html'">Register Here</button>
+    <button class="btn-primary" onclick="window.location.href='login.html'">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="white" stroke-width="1.3" fill="none"/><circle cx="7" cy="7" r="2" fill="white"/></svg>
+      Access Your Vault
+    </button>
+    <div class="mobile-menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-radial"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow reveal">
+      <div class="eyebrow-dot"></div>
+      AES-256 Military-Grade Encryption Active
+    </div>
+    <h1 class="hero-title reveal reveal-delay-1">
+      Your wealth deserves<br><em>fortress-level</em><br>protection.
+    </h1>
+    <p class="hero-body reveal reveal-delay-2">ArcLight Capital Partners delivers a private digital vault built exclusively for institutional investors and high-net-worth families. Every document encrypted. Every access verified. Every moment, an immutable record.</p>
+    <div class="hero-actions reveal reveal-delay-3">
+      <button class="btn-hero" onclick="window.location.href='login.html'">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1" stroke="white" stroke-width="1.4"/><path d="M5 7V5C5 3.34 6.34 2 8 2C9.66 2 11 3.34 11 5V7" stroke="white" stroke-width="1.4" fill="none"/><circle cx="8" cy="10.5" r="1.2" fill="white"/></svg>
+        Access Your Secure Vault
+      </button>
+      <button class="btn-hero-ghost" onclick="window.location.href='#how'">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 7.5H9.5M9.5 7.5L7.5 5.5M9.5 7.5L7.5 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        See How It Works
+      </button>
+    </div>
+    <div class="hero-trust-row reveal reveal-delay-4">
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1L11.5 3.5V7C11.5 9.8 9.2 12 6.5 13C3.8 12 1.5 9.8 1.5 7V3.5L6.5 1Z" stroke="#10b981" stroke-width="1.2" fill="none"/><path d="M4 6.5L5.8 8.3L9.5 4.5" stroke="#10b981" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+        SOC 2 Type II
+      </div>
+      <span class="trust-sep">·</span>
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2" stroke="#6ee7b7" stroke-width="1.2"/><path d="M4 6.5L5.8 8.3L9.5 4.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+        ISO 27001
+      </div>
+      <span class="trust-sep">·</span>
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#93c5fd" stroke-width="1.2"/><path d="M4 6.5L5.8 8.3L9.5 4.5" stroke="#93c5fd" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+        FINRA Compliant
+      </div>
+      <span class="trust-sep">·</span>
+      <div class="trust-item">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1L8.2 5.3L13 5.7L9.5 8.8L10.5 13L6.5 10.5L2.5 13L3.5 8.8L0 5.7L4.8 5.3L6.5 1Z" stroke="#fbbf24" stroke-width="1.1" fill="none"/></svg>
+        GDPR Aligned
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-visual-inner">
+      <svg class="vault-hero-svg" viewBox="0 0 520 560" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="vaultGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1e3a5f" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#050810" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="doorFace" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#1a2d4a"/>
+            <stop offset="100%" stop-color="#0a1220"/>
+          </radialGradient>
+          <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="dialGrad" cx="50%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#1e3a5f"/>
+            <stop offset="100%" stop-color="#091420"/>
+          </radialGradient>
+          <filter id="glow-blue">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-strong">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <linearGradient id="boltGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4a7cbf"/>
+            <stop offset="100%" stop-color="#1a3560"/>
+          </linearGradient>
+          <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2a4a7a"/>
+            <stop offset="50%" stop-color="#1a3060"/>
+            <stop offset="100%" stop-color="#0e1e40"/>
+          </linearGradient>
+          <clipPath id="vaultClip">
+            <rect x="60" y="40" width="400" height="480" rx="20"/>
+          </clipPath>
+        </defs>
+        <ellipse cx="260" cy="280" rx="240" ry="250" fill="url(#vaultGlow)" opacity="0.6"/>
+        <rect x="40" y="20" width="440" height="520" rx="24" fill="#070e1c" stroke="#1a2d4a" stroke-width="2"/>
+        <rect x="48" y="28" width="424" height="504" rx="20" fill="#090f1e" stroke="#1e3560" stroke-width="1"/>
+        <path d="M56 42 L56 518 Q56 530 68 530 L452 530" stroke="#1e3560" stroke-width="0.5" opacity="0.6"/>
+        <path d="M68 36 L452 36 Q464 36 464 48 L464 518" stroke="#0e2040" stroke-width="0.5" opacity="0.4"/>
+        <rect x="62" y="42" width="396" height="476" rx="18" fill="url(#doorFace)" stroke="#1a3060" stroke-width="1.5"/>
+        <rect x="72" y="52" width="376" height="456" rx="14" fill="none" stroke="#1e3a68" stroke-width="1"/>
+        <rect x="80" y="60" width="360" height="440" rx="11" fill="#0b1628" stroke="#132040" stroke-width="0.5"/>
+        <rect x="62" y="42" width="396" height="12" rx="0" fill="rgba(59,130,246,0.04)" clip-path="url(#vaultClip)">
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,476;0,0" dur="6s" repeatCount="indefinite"/>
+        </rect>
+        <circle cx="260" cy="250" r="115" fill="none" stroke="#1a3060" stroke-width="2"/>
+        <circle cx="260" cy="250" r="108" fill="#0a1628" stroke="#203a6a" stroke-width="1.5"/>
+        <g style="transform-origin:260px 250px;animation:rotate-slow 20s linear infinite">
+          <circle cx="260" cy="250" r="100" fill="none" stroke="#1e3a6e" stroke-width="1.5" stroke-dasharray="6 4"/>
+        </g>
+        <g style="transform-origin:260px 250px;animation:rotate-rev 30s linear infinite">
+          <circle cx="260" cy="250" r="93" fill="none" stroke="none"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(30 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(60 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(90 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(120 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(150 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(180 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(210 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(240 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(270 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(300 260 250)"/>
+          <line x1="260" y1="160" x2="260" y2="172" stroke="#2a4a8a" stroke-width="2" stroke-linecap="round" transform="rotate(330 260 250)"/>
+        </g>
+        <circle cx="260" cy="250" r="82" fill="url(#dialGrad)" stroke="#243a6e" stroke-width="1.5"/>
+        <circle cx="260" cy="250" r="75" fill="#091220" stroke="#1a3060" stroke-width="1"/>
+        <circle cx="260" cy="250" r="68" fill="url(#innerGlow)"/>
+        <g filter="url(#glow-blue)">
+          <path d="M241 242 Q241 220 260 220 Q279 220 279 242" stroke="#3b82f6" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <rect x="232" y="240" width="56" height="42" rx="6" fill="#0e2040" stroke="#3b82f6" stroke-width="2.5"/>
+          <circle cx="260" cy="256" r="8" fill="none" stroke="#3b82f6" stroke-width="2"/>
+          <rect x="257" y="260" width="6" height="10" rx="2" fill="#3b82f6" opacity="0.8"/>
+        </g>
+        <line x1="260" y1="250" x2="260" y2="185" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" opacity="0.9">
+          <animateTransform attributeName="transform" type="rotate" values="0 260 250;360 260 250" dur="8s" repeatCount="indefinite"/>
+        </line>
+        <circle cx="260" cy="250" r="6" fill="#3b82f6"/>
+        <circle cx="260" cy="250" r="3" fill="#93c5fd"/>
+        <circle cx="108" cy="100" r="18" fill="url(#boltGrad)" stroke="#2a4a8a" stroke-width="1.5"/>
+        <circle cx="108" cy="100" r="12" fill="#0d1e38" stroke="#1e3a6e" stroke-width="1"/>
+        <circle cx="108" cy="100" r="5" fill="#1e3a6e"/>
+        <line x1="108" y1="93" x2="108" y2="107" stroke="#2a4a8a" stroke-width="1.5"/>
+        <line x1="101" y1="100" x2="115" y2="100" stroke="#2a4a8a" stroke-width="1.5"/>
+
+        <circle cx="412" cy="100" r="18" fill="url(#boltGrad)" stroke="#2a4a8a" stroke-width="1.5"/>
+        <circle cx="412" cy="100" r="12" fill="#0d1e38" stroke="#1e3a6e" stroke-width="1"/>
+        <circle cx="412" cy="100" r="5" fill="#1e3a6e"/>
+        <line x1="412" y1="93" x2="412" y2="107" stroke="#2a4a8a" stroke-width="1.5"/>
+        <line x1="405" y1="100" x2="419" y2="100" stroke="#2a4a8a" stroke-width="1.5"/>
+
+        <circle cx="108" cy="400" r="18" fill="url(#boltGrad)" stroke="#2a4a8a" stroke-width="1.5"/>
+        <circle cx="108" cy="400" r="12" fill="#0d1e38" stroke="#1e3a6e" stroke-width="1"/>
+        <circle cx="108" cy="400" r="5" fill="#1e3a6e"/>
+        <line x1="108" y1="393" x2="108" y2="407" stroke="#2a4a8a" stroke-width="1.5"/>
+        <line x1="101" y1="400" x2="115" y2="400" stroke="#2a4a8a" stroke-width="1.5"/>
+
+        <circle cx="412" cy="400" r="18" fill="url(#boltGrad)" stroke="#2a4a8a" stroke-width="1.5"/>
+        <circle cx="412" cy="400" r="12" fill="#0d1e38" stroke="#1e3a6e" stroke-width="1"/>
+        <circle cx="412" cy="400" r="5" fill="#1e3a6e"/>
+        <line x1="412" y1="393" x2="412" y2="407" stroke="#2a4a8a" stroke-width="1.5"/>
+        <line x1="405" y1="400" x2="419" y2="400" stroke="#2a4a8a" stroke-width="1.5"/>
+        <circle cx="108" cy="250" r="14" fill="url(#boltGrad)" stroke="#2a4a8a" stroke-width="1.5"/>
+        <circle cx="108" cy="250" r="8" fill="#0d1e38" stroke="#1e3a6e" stroke-width="1"/>
+        <circle cx="412" cy="250" r="14" fill="url(#boltGrad)" stroke="#2a4a8a" stroke-width="1.5"/>
+        <circle cx="412" cy="250" r="8" fill="#0d1e38" stroke="#1e3a6e" stroke-width="1"/>
+
+        <rect x="64" y="178" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="64" y="226" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="64" y="308" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="64" y="356" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="428" y="178" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="428" y="226" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="428" y="308" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="428" y="356" width="28" height="18" rx="4" fill="#122040" stroke="#1e3a6e" stroke-width="1"/>
+
+        <rect x="64" y="179" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+        <rect x="64" y="227" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+        <rect x="64" y="309" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+        <rect x="64" y="357" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+        <rect x="450" y="179" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+        <rect x="450" y="227" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+        <rect x="450" y="309" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+        <rect x="450" y="357" width="6" height="16" rx="2" fill="#3b82f6" opacity="0.5"/>
+
+        <rect x="100" y="430" width="320" height="72" rx="8" fill="#081220" stroke="#1a3060" stroke-width="1"/>
+        <rect x="108" y="438" width="304" height="56" rx="5" fill="#050d1c" stroke="#132040" stroke-width="0.5"/>
+
+        <circle cx="130" cy="455" r="5" fill="#10b981" filter="url(#glow-blue)">
+          <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <text x="142" y="459" fill="#4a7a9b" font-size="9" font-family="'SF Mono','Fira Code',monospace" letter-spacing="0.08em">VAULT ARMED</text>
+        <circle cx="130" cy="473" r="5" fill="#3b82f6" filter="url(#glow-blue)">
+          <animate attributeName="opacity" values="1;0.6;1" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <text x="142" y="477" fill="#4a7a9b" font-size="9" font-family="'SF Mono','Fira Code',monospace" letter-spacing="0.08em">AES-256 ACTIVE</text>
+        <text x="290" y="453" fill="#1e3a60" font-size="7" font-family="monospace" letter-spacing="0.1em">10110100 11001</text>
+        <text x="290" y="465" fill="#1e3a60" font-size="7" font-family="monospace" letter-spacing="0.1em">01001110 10111</text>
+        <text x="290" y="477" fill="#1e3a60" font-size="7" font-family="monospace" letter-spacing="0.1em">11100011 01010</text>
+        <rect x="62" y="42" width="396" height="2" rx="1" fill="#1e3a68" opacity="0.6"/>
+        <rect x="62" y="516" width="396" height="2" rx="1" fill="#1e3a68" opacity="0.3"/>
+        <rect x="186" y="68" width="148" height="28" rx="4" fill="#081220" stroke="#1a3060" stroke-width="1"/>
+        <text x="260" y="87" fill="#3b6090" font-size="9" font-family="'SF Mono','Fira Code',monospace" text-anchor="middle" letter-spacing="0.15em">ARCLIGHT VAULT SV-01</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="stats-belt">
+  <div class="stats-inner">
+    <div class="stat-block reveal">
+      <div class="stat-num" data-target="47" data-suffix="B+">$0</div>
+      <div class="stat-label">Assets Under Management</div>
+    </div>
+    <div class="stat-block reveal reveal-delay-1">
+      <div class="stat-num" data-target="1200" data-suffix="+">0</div>
+      <div class="stat-label">Institutional Clients</div>
+    </div>
+    <div class="stat-block reveal reveal-delay-2">
+      <div class="stat-num" data-target="99.99" data-decimals="2" data-suffix="%">0</div>
+      <div class="stat-label">Vault Uptime SLA</div>
+    </div>
+    <div class="stat-block reveal reveal-delay-3">
+      <div class="stat-num"><span style="font-family:var(--sans);font-size:42px">Zero</span></div>
+      <div class="stat-label">Security Breaches Since 2014</div>
+    </div>
+  </div>
+</div>
+
+<div class="security-band">
+  <div class="security-band-inner">
+    <div class="sec-vis-card reveal">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <defs><radialGradient id="plg1" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#1a3560"/><stop offset="100%" stop-color="#080f1e"/></radialGradient></defs>
+        <circle cx="50" cy="50" r="46" fill="#080f1e" stroke="#1a3060" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="40" fill="url(#plg1)" stroke="#1e3a6e" stroke-width="1"/>
+        <path d="M34 46 Q34 24 50 24 Q66 24 66 46" stroke="#3b82f6" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <rect x="26" y="44" width="48" height="34" rx="7" fill="#0a1c38" stroke="#3b82f6" stroke-width="2.5"/>
+        <rect x="26" y="44" width="48" height="6" rx="7" fill="rgba(59,130,246,0.15)"/>
+        <circle cx="50" cy="57" r="7" fill="none" stroke="#3b82f6" stroke-width="2"/>
+        <rect x="47" y="60" width="6" height="9" rx="2" fill="#3b82f6" opacity="0.85"/>
+        <circle cx="50" cy="57" r="14" fill="rgba(59,130,246,0.08)"><animate attributeName="r" values="12;18;12" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.1;0.05;0.1" dur="3s" repeatCount="indefinite"/></circle>
+        <path d="M34 46 Q34 24 50 24" stroke="rgba(147,197,253,0.4)" stroke-width="1.5" fill="none"/>
+      </svg>
+      <div class="sec-vis-label">Encrypted at Rest</div>
+      <div class="sec-vis-sub">AES-256-GCM cipher. Every file locked the moment it enters the vault.</div>
+    </div>
+    <div class="sec-vis-card reveal reveal-delay-1">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <defs><radialGradient id="vwg" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#1a3560"/><stop offset="100%" stop-color="#080f1e"/></radialGradient></defs>
+        <circle cx="50" cy="50" r="46" fill="#080f1e" stroke="#1a3060" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="38" fill="url(#vwg)" stroke="#1e3a6e" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="32" fill="none" stroke="#2a4a8a" stroke-width="1.5" stroke-dasharray="5 3"><animateTransform attributeName="transform" type="rotate" values="0 50 50;360 50 50" dur="12s" repeatCount="indefinite"/></circle>
+        <g style="transform-origin:50px 50px;animation:rotate-rev 20s linear infinite">
+          <line x1="50" y1="18" x2="50" y2="82" stroke="#1e3a6e" stroke-width="1.5"/>
+          <line x1="18" y1="50" x2="82" y2="50" stroke="#1e3a6e" stroke-width="1.5"/>
+          <line x1="27" y1="27" x2="73" y2="73" stroke="#1e3a6e" stroke-width="1.5"/>
+          <line x1="73" y1="27" x2="27" y2="73" stroke="#1e3a6e" stroke-width="1.5"/>
+        </g>
+        <circle cx="50" cy="50" r="18" fill="#0a1628" stroke="#3b82f6" stroke-width="2"/>
+        <circle cx="50" cy="50" r="12" fill="#091420" stroke="#1e3a60" stroke-width="1"/>
+        <circle cx="50" cy="50" r="4" fill="#3b82f6"/>
+        <line x1="50" y1="50" x2="50" y2="36" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" values="0 50 50;360 50 50" dur="6s" repeatCount="indefinite"/></line>
+        <line x1="50" y1="14" x2="50" y2="20" stroke="#2a4a8a" stroke-width="2"/>
+        <line x1="50" y1="14" x2="50" y2="20" stroke="#2a4a8a" stroke-width="2" transform="rotate(60 50 50)"/>
+        <line x1="50" y1="14" x2="50" y2="20" stroke="#2a4a8a" stroke-width="2" transform="rotate(120 50 50)"/>
+        <line x1="50" y1="14" x2="50" y2="20" stroke="#2a4a8a" stroke-width="2" transform="rotate(180 50 50)"/>
+        <line x1="50" y1="14" x2="50" y2="20" stroke="#2a4a8a" stroke-width="2" transform="rotate(240 50 50)"/>
+        <line x1="50" y1="14" x2="50" y2="20" stroke="#2a4a8a" stroke-width="2" transform="rotate(300 50 50)"/>
+      </svg>
+      <div class="sec-vis-label">Combination Lock Access</div>
+      <div class="sec-vis-sub">Multi-factor authentication with rotating cryptographic tokens.</div>
+    </div>
+    <div class="sec-vis-card reveal reveal-delay-2">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <defs><radialGradient id="shg" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#1a3560"/><stop offset="100%" stop-color="#080f1e"/></radialGradient></defs>
+        <circle cx="50" cy="50" r="46" fill="#080f1e" stroke="#1a3060" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="40" fill="url(#shg)" stroke="#1e3a6e" stroke-width="1"/>
+        <path d="M50 18 L72 28 L72 52 Q72 68 50 78 Q28 68 28 52 L28 28 Z" fill="#0a1c38" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M50 24 L66 32 L66 52 Q66 64 50 72 Q34 64 34 52 L34 32 Z" fill="rgba(59,130,246,0.07)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+        <path d="M39 50 L46 58 L62 40" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M50 18 L72 28 L72 32 L50 22 L28 32 L28 28 Z" fill="rgba(147,197,253,0.1)"/>
+        <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(59,130,246,0.15)" stroke-width="1"><animate attributeName="r" values="30;42;30" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite"/></circle>
+      </svg>
+      <div class="sec-vis-label">Active Threat Shield</div>
+      <div class="sec-vis-sub">Real-time intrusion detection and automated threat neutralization.</div>
+    </div>
+    <div class="sec-vis-card reveal reveal-delay-3">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <defs><radialGradient id="srv" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#1a3560"/><stop offset="100%" stop-color="#080f1e"/></radialGradient></defs>
+        <circle cx="50" cy="50" r="46" fill="#080f1e" stroke="#1a3060" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="40" fill="url(#srv)" stroke="#1e3a6e" stroke-width="1"/>
+        <rect x="26" y="22" width="48" height="14" rx="2" fill="#0a1c38" stroke="#1e3a6e" stroke-width="1.5"/>
+        <rect x="30" y="26" width="18" height="6" rx="1" fill="#091420" stroke="#132040" stroke-width="0.5"/>
+        <circle cx="68" cy="29" r="3" fill="#10b981"><animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/></circle>
+        <circle cx="60" cy="29" r="3" fill="#3b82f6"><animate attributeName="opacity" values="1;0.3;1" dur="2.4s" repeatCount="indefinite"/></circle>
+        <rect x="26" y="40" width="48" height="14" rx="2" fill="#0a1c38" stroke="#1e3a6e" stroke-width="1.5"/>
+        <rect x="30" y="44" width="24" height="6" rx="1" fill="#091420" stroke="#132040" stroke-width="0.5"/>
+        <circle cx="68" cy="47" r="3" fill="#10b981"><animate attributeName="opacity" values="1;0.3;1" dur="2.2s" repeatCount="indefinite"/></circle>
+        <circle cx="60" cy="47" r="3" fill="#10b981"><animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite"/></circle>
+        <rect x="26" y="58" width="48" height="14" rx="2" fill="#0a1c38" stroke="#1e3a6e" stroke-width="1.5"/>
+        <rect x="30" y="62" width="20" height="6" rx="1" fill="#091420" stroke="#132040" stroke-width="0.5"/>
+        <circle cx="68" cy="65" r="3" fill="#3b82f6"><animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/></circle>
+        <circle cx="60" cy="65" r="3" fill="#10b981"><animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/></circle>
+        <rect x="26" y="76" width="48" height="10" rx="2" fill="#0a1c38" stroke="#1e3a6e" stroke-width="1.5"/>
+        <line x1="50" y1="36" x2="50" y2="40" stroke="#1e3a6e" stroke-width="1" stroke-dasharray="2 2"/>
+        <line x1="50" y1="54" x2="50" y2="58" stroke="#1e3a6e" stroke-width="1" stroke-dasharray="2 2"/>
+        <line x1="50" y1="72" x2="50" y2="76" stroke="#1e3a6e" stroke-width="1" stroke-dasharray="2 2"/>
+      </svg>
+      <div class="sec-vis-label">Geo-Redundant Servers</div>
+      <div class="sec-vis-sub">Triple-redundant infrastructure across 3 geographic regions, 24/7.</div>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="section-max">
+    <div class="features-header">
+      <div class="section-eyebrow reveal">Security Architecture</div>
+      <h2 class="section-title reveal reveal-delay-1">Built for the most<br>demanding institutions.</h2>
+      <p class="section-body reveal reveal-delay-2">Every layer of ArcLight Vault is designed with the assumption that your documents are irreplaceable. Because they are.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L17 5.5V11C17 14.5 13.8 17.5 10 18.5C6.2 17.5 3 14.5 3 11V5.5L10 2Z" stroke="#3b82f6" stroke-width="1.5" fill="none"/><path d="M7 10.5L9 12.5L13 8.5" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div><div class="feat-title">AES-256-GCM Encryption</div><div class="feat-body">Every file is independently encrypted using military-grade AES-256-GCM cipher with unique per-document keys. Your data is unreadable without explicit authorization — even to us.</div><div class="feat-tag">Encryption at Rest &amp; Transit</div></div>
+      <div class="feat-card reveal reveal-delay-1"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="#3b82f6" stroke-width="1.5"/><path d="M10 6V10.5L13 12.5" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="feat-title">Signed URL Access Control</div><div class="feat-body">Document downloads require cryptographically signed, time-limited URLs that expire in 60 seconds. No persistent links, no shared access — every download is a unique event.</div><div class="feat-tag">Zero Persistent Links</div></div>
+      <div class="feat-card reveal reveal-delay-2"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 6H16M4 10H12M4 14H9" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/><rect x="1.5" y="2.5" width="17" height="15" rx="2" stroke="#3b82f6" stroke-width="1.5" fill="none"/></svg></div><div class="feat-title">Immutable Audit Log</div><div class="feat-body">Every vault interaction is written to a tamper-proof, cryptographically chained log. Full forensic traceability, always. WORM-compliant storage with no deletion possible.</div><div class="feat-tag">WORM Compliant</div></div>
+      <div class="feat-card reveal"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="5.5" width="16" height="11" rx="2" stroke="#3b82f6" stroke-width="1.5" fill="none"/><path d="M6 5.5V4C6 3.17 6.67 2.5 7.5 2.5H12.5C13.33 2.5 14 3.17 14 4V5.5" stroke="#3b82f6" stroke-width="1.5" fill="none"/><circle cx="10" cy="11" r="2" stroke="#3b82f6" stroke-width="1.2"/></svg></div><div class="feat-title">Multi-Factor Authentication</div><div class="feat-body">Access requires your institutional email, a rotating secure access token, and optionally biometric or hardware key confirmation. Session isolation ensures no lateral movement.</div><div class="feat-tag">MFA + Hardware Key</div></div>
+      <div class="feat-card reveal reveal-delay-1"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="#3b82f6" stroke-width="1.5"/><path d="M6 10C6 7.79 7.79 6 10 6C12.21 6 14 7.79 14 10" stroke="#3b82f6" stroke-width="1.4" stroke-linecap="round" fill="none"/><circle cx="10" cy="14" r="1.5" fill="#3b82f6"/></svg></div><div class="feat-title">Zero-Knowledge Architecture</div><div class="feat-body">Encryption keys are derived from client-controlled secrets. ArcLight infrastructure never holds unencrypted document data — by design. True zero-knowledge at the application layer.</div><div class="feat-tag">Client-Controlled Keys</div></div>
+      <div class="feat-card reveal reveal-delay-2"><div class="feat-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2.5" stroke="#3b82f6" stroke-width="1.5" fill="none"/><path d="M7 10L9 12L13 8" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div><div class="feat-title">Automated Integrity Scans</div><div class="feat-body">SHA-3 hash verification runs against all stored documents every 6 hours. Any file modification — however subtle — is detected instantly and escalated to your security contact.</div><div class="feat-tag">6-Hour Verification Cycles</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="hiw-section" id="how">
+  <div class="section-max">
+    <div class="hiw-layout">
+      <div>
+        <div class="section-eyebrow reveal">Onboarding Process</div>
+        <h2 class="section-title reveal reveal-delay-1">From application to<br>encrypted vault in 48 hours.</h2>
+        <p class="section-body reveal reveal-delay-2" style="margin-bottom:2.5rem">Our onboarding is designed for institutional clients. No compromises on due diligence — and no unnecessary friction.</p>
+        <div class="hiw-steps">
+          <div class="hiw-step reveal">
+            <div class="step-icon-wrap"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="1.5" stroke="#3b82f6" stroke-width="1.3" fill="none"/><path d="M6 8H12M6 11H10" stroke="#3b82f6" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+            <div><div class="step-num">Step 1 — Application</div><div class="step-title">Submit your institutional profile</div><div class="step-body">Complete our secure onboarding form with your entity details, AUM range, and primary custody arrangements. Reviewed within one business day.</div></div>
+          </div>
+          <div class="hiw-step reveal reveal-delay-1">
+            <div class="step-icon-wrap"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="7" r="4" stroke="#3b82f6" stroke-width="1.3" fill="none"/><path d="M3 16C3 13.24 5.69 11 9 11C12.31 11 15 13.24 15 16" stroke="#3b82f6" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+            <div><div class="step-num">Step 2 — Verification</div><div class="step-title">Identity and accreditation verified</div><div class="step-body">We run KYC/AML, confirm accredited or qualified purchaser status, and provision credentials through a secure delivery channel — never email.</div></div>
+          </div>
+          <div class="hiw-step reveal reveal-delay-2">
+            <div class="step-icon-wrap"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5L16 5V13L9 16.5L2 13V5L9 1.5Z" stroke="#3b82f6" stroke-width="1.3" fill="none"/><circle cx="9" cy="9" r="2.5" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="1.1"/></svg></div>
+            <div><div class="step-num">Step 3 — Vault Provisioned</div><div class="step-title">Your encrypted vault goes live</div><div class="step-body">Your dedicated vault namespace is provisioned with your chosen encryption scheme. Documents can be bulk-ingested via secure transfer or uploaded directly.</div></div>
+          </div>
+          <div class="hiw-step reveal reveal-delay-3">
+            <div class="step-icon-wrap"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9L7 12L14 6" stroke="#3b82f6" stroke-width="1.4" stroke-linecap="round" fill="none"/><rect x="1.5" y="1.5" width="15" height="15" rx="3" stroke="#3b82f6" stroke-width="1.3" fill="none"/></svg></div>
+            <div><div class="step-num">Step 4 — Ongoing Access</div><div class="step-title">Secure access, any device, always audited</div><div class="step-body">Authenticate from any authorized device. Every session is timed, encrypted, and logged. Anomalous access patterns are reviewed proactively on your behalf.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="vault-mockup">
+          <div class="mockup-header"><div class="mockup-title">Harrington Family Office · Active Vault</div><div class="mockup-status"><div class="m-dot"></div>Fully Encrypted</div></div>
+          <div class="mockup-file"><div class="mf-icon mf-pdf">PDF</div><div class="mf-info"><div class="mf-name">Q3_Portfolio_Summary_2024.pdf</div><div class="mf-meta">4.2 MB · Nov 05, 2024</div></div><div class="mf-enc">AES-256</div></div>
+          <div class="mockup-file"><div class="mf-icon mf-doc">DOC</div><div class="mf-info"><div class="mf-name">Trust_Deed_Amendment_v4.docx</div><div class="mf-meta">1.8 MB · Oct 28, 2024</div></div><div class="mf-enc">AES-256</div></div>
+          <div class="mockup-file"><div class="mf-icon mf-pdf">PDF</div><div class="mf-info"><div class="mf-name">Asset_Proof_Primary_Holdings.pdf</div><div class="mf-meta">2.1 MB · Oct 12, 2024</div></div><div class="mf-enc">AES-256</div></div>
+          <div class="mockup-file"><div class="mf-icon mf-xls">XLS</div><div class="mf-info"><div class="mf-name">AUM_Reconciliation_Q2_2024.xlsx</div><div class="mf-meta">1.2 MB · Aug 01, 2024</div></div><div class="mf-enc">AES-256</div></div>
+          <div class="mockup-footer"><div class="mockup-footer-label">Vault Integrity Score</div><div class="mockup-footer-val">100% — 47/47 verified ✓</div></div>
+          <div style="margin-top:12px;background:var(--card-alt);border-radius:6px;overflow:hidden;height:4px;"><div style="height:100%;width:100%;background:linear-gradient(90deg,#0891b2,#10b981);border-radius:6px;"></div></div>
+          <div style="margin-top:8px;font-size:10.5px;color:var(--muted);font-family:var(--mono);display:flex;justify-content:space-between;"><span>Session · TLS 1.3 Active</span><span style="color:#6ee7b7;">IP Verified ✓</span></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:1rem;">
+          <div style="flex:1;background:var(--card);border:1px solid var(--border-1);border-radius:var(--r-md);padding:12px 14px;"><div style="font-size:9.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;font-weight:600">Uptime</div><div style="font-size:18px;font-weight:700;color:#6ee7b7;font-family:var(--mono)">99.99%</div></div>
+          <div style="flex:1;background:var(--card);border:1px solid var(--border-1);border-radius:var(--r-md);padding:12px 14px;"><div style="font-size:9.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;font-weight:600">Backups</div><div style="font-size:18px;font-weight:700;color:var(--white);font-family:var(--mono)">6h Cycle</div></div>
+          <div style="flex:1;background:var(--card);border:1px solid var(--border-1);border-radius:var(--r-md);padding:12px 14px;"><div style="font-size:9.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;font-weight:600">Regions</div><div style="font-size:18px;font-weight:700;color:var(--white);font-family:var(--mono)">3× GEO</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-max">
+    <div class="security-grid">
+      <div>
+        <div class="section-eyebrow reveal">Compliance &amp; Infrastructure</div>
+        <h2 class="section-title reveal reveal-delay-1">Trusted by institutions<br>that trust nothing.</h2>
+        <p class="section-body reveal reveal-delay-2" style="margin-bottom:2rem">ArcLight's infrastructure exceeds requirements imposed by the SEC, FINRA, and leading family office governance frameworks. Not meeting minimum standards — setting new ones.</p>
+        <div class="compliance-row reveal reveal-delay-3">
+          <div class="comp-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L10.5 3V7.5C10.5 9.7 8.5 11.5 6 12C3.5 11.5 1.5 9.7 1.5 7.5V3L6 1Z" stroke="#6ee7b7" stroke-width="1.1" fill="none"/></svg>SOC 2 Type II</div>
+          <div class="comp-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2" stroke="#93c5fd" stroke-width="1.1"/><path d="M4 6L5.5 7.5L8.5 4.5" stroke="#93c5fd" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>ISO 27001</div>
+          <div class="comp-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#fbbf24" stroke-width="1.1"/><path d="M4 6L5.5 7.5L8.5 4.5" stroke="#fbbf24" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>FINRA</div>
+          <div class="comp-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5" stroke="#c4b5fd" stroke-width="1.1"/><path d="M4 6L5.5 7.5L8.5 4.5" stroke="#c4b5fd" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>GDPR</div>
+          <div class="comp-badge"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 3.5L11 8.5L6 11L1 8.5L1 3.5L6 1Z" stroke="#6ee7b7" stroke-width="1.1" fill="none"/></svg>SEC 17a-4</div>
+        </div>
+      </div>
+      <div class="sec-visual">
+        <div class="sec-card reveal"><div class="sec-card-label">Primary Cipher</div><div class="sec-card-val">AES-256</div><div class="sec-card-sub">GCM mode with unique per-document IV</div></div>
+        <div class="sec-card reveal reveal-delay-1"><div class="sec-card-label">Key Exchange</div><div class="sec-card-val">ECDH</div><div class="sec-card-sub">P-384 curve, ephemeral sessions</div></div>
+        <div class="sec-card reveal reveal-delay-2"><div class="sec-card-label">TLS Version</div><div class="sec-card-val" style="color:#6ee7b7">TLS 1.3</div><div class="sec-card-sub">HSTS enforced, no fallback</div></div>
+        <div class="sec-card reveal reveal-delay-3"><div class="sec-card-label">Hash Function</div><div class="sec-card-val">SHA-3</div><div class="sec-card-sub">512-bit file integrity verification</div></div>
+        <div class="sec-card full reveal reveal-delay-4"><div class="sec-card-label">Storage Architecture</div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div class="sec-card-val" style="font-size:16px">Triple-redundant geo-distributed</div><div style="background:var(--emerald-dim);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:3px 8px;font-size:10px;font-weight:600;color:#6ee7b7;font-family:var(--mono)">ACTIVE</div></div><div class="sec-card-sub">US-EAST-1 · US-WEST-2 · EU-CENTRAL-1 — all regions synced, all encrypted at rest</div></div>
+      </div>
+    </div>
+    <div style="margin-top:4rem;display:grid;grid-template-columns:repeat(2,1fr);gap:2rem">
+      <div class="sec-item reveal"><div class="sec-item-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L14 4.5V10C14 12.8 11.3 15 8 16C4.7 15 2 12.8 2 10V4.5L8 1.5Z" stroke="#3b82f6" stroke-width="1.3" fill="none"/></svg></div><div><div class="sec-item-title">Session Isolation</div><div class="sec-item-body">Every authenticated session is cryptographically isolated. Tokens are single-use and bound to the requesting IP and device fingerprint.</div></div></div>
+      <div class="sec-item reveal reveal-delay-1"><div class="sec-item-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#3b82f6" stroke-width="1.3"/><path d="M5 8.5L7 10.5L11 6.5" stroke="#3b82f6" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg></div><div><div class="sec-item-title">Penetration Tested Quarterly</div><div class="sec-item-body">Independent third-party penetration testing by CREST-certified firms. Full reports available to institutional clients under NDA on request.</div></div></div>
+      <div class="sec-item reveal reveal-delay-2"><div class="sec-item-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5H14M2 8H10M2 11H7" stroke="#3b82f6" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="sec-item-title">Immutable WORM Audit Log</div><div class="sec-item-body">Write-once, read-many audit logs with cryptographic chaining. Deletions are impossible — even by ArcLight administrators. Full SEC 17a-4 compliance.</div></div></div>
+      <div class="sec-item reveal reveal-delay-3"><div class="sec-item-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4.5" width="12" height="9" rx="1.5" stroke="#3b82f6" stroke-width="1.3" fill="none"/><path d="M5 4.5V3.5C5 2.67 5.67 2 6.5 2H9.5C10.33 2 11 2.67 11 3.5V4.5" stroke="#3b82f6" stroke-width="1.3" fill="none"/><circle cx="8" cy="9" r="1.5" stroke="#3b82f6" stroke-width="1.1"/></svg></div><div><div class="sec-item-title">Hardware Security Module (HSM)</div><div class="sec-item-body">Master key material stored in FIPS 140-2 Level 3 certified HSMs. Keys never touch unprotected memory.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials-section" id="testimonials">
+  <div class="section-max">
+    <div style="text-align:center;max-width:600px;margin:0 auto">
+      <div class="section-eyebrow reveal">Client Testimonials</div>
+      <h2 class="section-title reveal reveal-delay-1">Trusted by family offices<br>and institutions globally.</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal"><div class="testi-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><div class="testi-quote">The ArcLight Vault replaced three separate document management systems for our family office. The audit trail alone is worth the cost — our compliance team hasn't slept better in years.</div><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#1d4ed8,#0891b2)">MW</div><div><div class="testi-name">Margaret W.</div><div class="testi-role">COO, Westbrook Family Office · $2.3B AUM</div></div></div></div>
+      <div class="testi-card reveal reveal-delay-1"><div class="testi-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><div class="testi-quote">We evaluated six platforms. ArcLight was the only one that could provide a zero-knowledge architecture while meeting our SEC 17a-4 requirements. The onboarding was seamless.</div><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#065f46,#0891b2)">DR</div><div><div class="testi-name">David R.</div><div class="testi-role">CIO, Redstone Capital Partners · Institutional</div></div></div></div>
+      <div class="testi-card reveal reveal-delay-2"><div class="testi-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><div class="testi-quote">After a competitor suffered a data incident, we moved our entire document infrastructure to ArcLight within 72 hours. The signed URL system means I never worry about documents being forwarded.</div><div class="testi-author"><div class="testi-avatar" style="background:linear-gradient(135deg,#7c3aed,#1d4ed8)">SK</div><div><div class="testi-name">Sarah K.</div><div class="testi-role">General Counsel, Kelborne Holdings Group</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="section-max">
+    <div style="text-align:center;max-width:560px;margin:0 auto">
+      <div class="section-eyebrow reveal">Vault Access Plans</div>
+      <h2 class="section-title reveal reveal-delay-1">Pricing that scales with<br>your institution.</h2>
+      <p class="section-body reveal reveal-delay-2" style="margin:0 auto 3.5rem;text-align:center;max-width:400px">All plans include full encryption, audit logging, and dedicated relationship management.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal"><div class="price-tier">Tier I</div><div class="price-name">Private Client</div><div class="price-amount"><sup>$</sup>295</div><div class="price-period">per month · billed annually</div><button class="price-btn price-btn-outline" onclick="window.location.href='register.html'">Request Access</button><hr class="price-divider"><div class="price-feature"><span class="check">✓</span>Up to 25 GB encrypted storage</div><div class="price-feature"><span class="check">✓</span>AES-256-GCM encryption</div><div class="price-feature"><span class="check">✓</span>Signed URL downloads</div><div class="price-feature"><span class="check">✓</span>90-day activity log retention</div><div class="price-feature"><span class="check">✓</span>2 authorized users</div><div class="price-feature"><span class="cross">–</span>Zero-knowledge key control</div><div class="price-feature"><span class="cross">–</span>HSM key storage</div><div class="price-feature"><span class="cross">–</span>Dedicated relationship manager</div></div>
+      <div class="price-card featured reveal reveal-delay-1"><div class="price-tier">Tier II</div><div class="price-name">Family Office</div><div class="price-amount"><sup>$</sup>895</div><div class="price-period">per month · billed annually</div><button class="price-btn price-btn-solid" onclick="window.location.href='register.html'">Request Access</button><hr class="price-divider"><div class="price-feature"><span class="check">✓</span>Up to 250 GB encrypted storage</div><div class="price-feature"><span class="check">✓</span>AES-256-GCM + client key control</div><div class="price-feature"><span class="check">✓</span>Signed URL + hardware token MFA</div><div class="price-feature"><span class="check">✓</span>7-year immutable log retention</div><div class="price-feature"><span class="check">✓</span>10 authorized users</div><div class="price-feature"><span class="check">✓</span>Zero-knowledge key control</div><div class="price-feature"><span class="check">✓</span>HSM key storage (FIPS 140-2 L3)</div><div class="price-feature"><span class="cross">–</span>Dedicated relationship manager</div></div>
+      <div class="price-card reveal reveal-delay-2"><div class="price-tier">Tier III</div><div class="price-name">Institutional</div><div class="price-amount" style="font-size:34px;padding-top:8px">Custom</div><div class="price-period">tailored to your requirements</div><button class="price-btn price-btn-outline" onclick="window.location.href='register.html'">Schedule a Call</button><hr class="price-divider"><div class="price-feature"><span class="check">✓</span>Unlimited encrypted storage</div><div class="price-feature"><span class="check">✓</span>Full cryptographic architecture review</div><div class="price-feature"><span class="check">✓</span>All MFA modalities supported</div><div class="price-feature"><span class="check">✓</span>Perpetual immutable log retention</div><div class="price-feature"><span class="check">✓</span>Unlimited authorized users</div><div class="price-feature"><span class="check">✓</span>Zero-knowledge key control</div><div class="price-feature"><span class="check">✓</span>HSM key storage (FIPS 140-2 L3)</div><div class="price-feature"><span class="check">✓</span>Dedicated relationship manager</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="cta-inner">
+    <div class="section-eyebrow reveal" style="justify-content:center;display:flex">Secure Your Documents Today</div>
+    <h2 class="cta-title reveal reveal-delay-1">The vault your<br><em>wealth deserves</em><br>is one click away.</h2>
+    <p class="cta-body reveal reveal-delay-2">Join over 1,200 institutional clients and family offices who trust ArcLight Capital Partners to protect what matters most. Onboarding takes 48 hours.</p>
+    <div class="cta-actions reveal reveal-delay-3">
+      <button class="btn-hero" onclick="window.location.href='login.html'"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1" stroke="white" stroke-width="1.4"/><path d="M5 7V5C5 3.34 6.34 2 8 2C9.66 2 11 3.34 11 5V7" stroke="white" stroke-width="1.4" fill="none"/><circle cx="8" cy="10.5" r="1.2" fill="white"/></svg>Request Vault Access</button>
+      <button class="btn-hero-ghost">Schedule a Consultation</button>
+    </div>
+    <div class="cta-note reveal reveal-delay-4">No public registrations — institutional onboarding only. Minimum AUM: $5M.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="nav-logo"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.5L18 5.5V14L10 18L2 14V5.5L10 1.5Z" stroke="#3b82f6" stroke-width="1.4" fill="none"/><circle cx="10" cy="9.5" r="3" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="1"/></svg></div>
+        <div class="nav-name-block"><span class="nav-name">ArcLight Capital Partners</span><span class="nav-sub">Secure Client Vault</span></div>
+      </div>
+      <p class="footer-desc">Institutional-grade encrypted document vault for high-net-worth clients and family offices. Military-grade security. Uncompromising compliance. Complete privacy.</p>
+      <div class="footer-badges"><div class="fbadge">SOC 2</div><div class="fbadge">ISO 27001</div><div class="fbadge">FINRA</div><div class="fbadge">SEC 17a-4</div></div>
+    </div>
+    <div class="footer-col"><h4>Platform</h4><a href="#">Secure Vault</a><a href="#">Document Encryption</a><a href="#">Audit Logging</a><a href="#">Access Management</a><a href="#">API Integration</a></div>
+    <div class="footer-col"><h4>Company</h4><a href="#">About ArcLight</a><a href="#">Leadership Team</a><a href="#">Careers</a><a href="#">Press &amp; Media</a><a href="#">Contact</a></div>
+    <div class="footer-col"><h4>Compliance</h4><a href="#">Security Overview</a><a href="#">SOC 2 Report</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Data Processing Agreement</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2024 ArcLight Capital Partners LLC. All rights reserved. Institutional clients only.</div>
+    <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Security</a><a href="#">Cookies</a></div>
+  </div>
+</footer>
+
+<script>
+const nav=document.getElementById('main-nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>40)},{passive:true});
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+function animateCounter(el){
+  const t=parseFloat(el.dataset.target),sf=el.dataset.suffix||'',dc=parseInt(el.dataset.decimals)||0;
+  if(isNaN(t))return;
+  const pre=t===47?'$':'',dur=1800,steps=60;let s=0;
+  const ti=setInterval(()=>{s++;const p=s/steps,e=1-Math.pow(1-p,3),v=t*e;el.textContent=pre+(dc>0?v.toFixed(dc):Math.round(v))+sf;if(s>=steps){el.textContent=pre+(dc>0?t.toFixed(dc):Math.round(t))+sf;clearInterval(ti)}},dur/steps);
+}
+const co=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&e.target.dataset.target!==undefined){animateCounter(e.target);co.unobserve(e.target)}})},{threshold:0.5});
+document.querySelectorAll('[data-target]').forEach(el=>co.observe(el));
+function toggleMenu(){
+  const l=document.querySelector('.nav-links');if(!l)return;
+  if(l.style.display==='flex'){l.style.display='';return}
+  l.style.cssText='display:flex;flex-direction:column;position:fixed;top:68px;left:0;right:0;background:rgba(5,8,16,0.97);padding:1.5rem 5%;gap:1.25rem;border-bottom:1px solid rgba(99,140,200,0.15);z-index:199;';
+}
+</script>
+</body>
+</html>
